@@ -1,0 +1,64 @@
+<div class="recipes-container">
+  <div class="header">
+    <h1>📖 Mes Recettes</h1>
+    <button class="btn btn-primary" (click)="openAddForm()">+ Ajouter une recette</button>
+  </div>
+
+  <div class="search-section">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Rechercher une recette..."
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+    />
+  </div>
+
+  @if(showForm()) {
+    <div class="modal-overlay" (click)="closeForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-recipe-form
+          [recipe]="selectedRecipe()"
+          (save)="onSaveRecipe($any($event))"
+          (formClosed)="closeForm()"
+        />
+      </div>
+    </div>
+  }
+
+  <div class="recipes-grid">
+    @if(filteredRecipes.length === 0) {
+      <div class="empty-state">
+        <p>Aucune recette trouvée. Commencez par en ajouter une !</p>
+      </div>
+    }
+
+    @for(recipe of filteredRecipes; track recipe.id) {
+      <div class="recipe-card">
+        <div class="recipe-image">
+          @if(recipe.image) {
+            <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-photo" />
+          } @else {
+            <div class="recipe-placeholder">
+              <span class="placeholder-icon">📸</span>
+            </div>
+          }
+        </div>
+        <div class="recipe-header">
+          <h3>{{ recipe.name }}</h3>
+          <span class="category-badge">{{ recipe.category }}</span>
+        </div>
+        <p class="recipe-description">{{ recipe.description }}</p>
+        <div class="recipe-info">
+          <span class="info-item">⏱️ {{ recipe.prepTime + recipe.cookTime }}min</span>
+          <span class="info-item">👥 {{ recipe.servings }} pers.</span>
+        </div>
+        <div class="recipe-actions">
+          <button class="btn btn-secondary" (click)="openEditForm(recipe)">Modifier</button>
+          <button class="btn btn-danger" (click)="onDeleteRecipe(recipe.id!)">Supprimer</button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

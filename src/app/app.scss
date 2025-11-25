@@ -1,0 +1,81 @@
+.app-toolbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .app-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+  }
+}
+
+.app-container {
+  height: calc(100vh - 64px);
+  display: flex;
+}
+
+.sidenav {
+  width: 260px;
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+
+  ::ng-deep {
+    .mat-mdc-list-base {
+      padding: 0;
+    }
+
+    button[mat-list-item] {
+      height: 48px;
+      padding: 0 16px;
+      margin: 4px 0;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      color: #666;
+      font-weight: 500;
+      border: none;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      &.active {
+        background-color: rgba(25, 103, 210, 0.12);
+        color: #1967d2;
+
+        .mat-icon {
+          color: #1967d2;
+        }
+      }
+
+      .mat-icon {
+        margin-right: 16px;
+        color: #999;
+      }
+    }
+  }
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #fafafa;
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidenav {
+    width: 100%;
+  }
+}

@@ -1,0 +1,25 @@
+<div class="recipe-list">
+  @if(filteredRecipes.length === 0) {
+    <div class="empty-state">
+      <p>Aucune recette trouvée.</p>
+    </div>
+  }
+
+  @for(recipe of filteredRecipes; track $index) {
+    <div class="recipe-card">
+      <div class="recipe-header">
+        <h3>{{ recipe.name }}</h3>
+        <span class="category-badge">{{ recipe.category }}</span>
+      </div>
+      <p class="recipe-description">{{ recipe.description }}</p>
+      <div class="recipe-info">
+        <span class="info-item">⏱️ {{ recipe.prepTime + recipe.cookTime }}min</span>
+        <span class="info-item">👥 {{ recipe.servings }} pers.</span>
+      </div>
+      <div class="recipe-actions">
+        <button class="btn btn-secondary" (click)="onEdit(recipe)">Modifier</button>
+        <button class="btn btn-danger" (click)="onDelete(recipe.id!)">Supprimer</button>
+      </div>
+    </div>
+  }
+</div>

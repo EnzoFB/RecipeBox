@@ -225,6 +225,83 @@ ipcMain.handle('ingredients:delete', async (_, id: number) => {
   }
 });
 
+// IPC Handlers for Ingredient Stock
+ipcMain.handle('stock:getAll', async () => {
+  try {
+    return await allAsync<any>(`
+      SELECT s.*, i.name, i.category
+      FROM ingredient_stock s
+      JOIN ingredients i ON s.ingredientId = i.id
+      ORDER BY s.expiryDate ASC
+    `);
+  } catch (error) {
+    console.error('Error fetching stock:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('stock:add', async (_, stock: any) => {
+  try {
+    const result = await new Promise<{ id: number }>((resolve, reject) => {
+      const db = require('./db').getDatabase();
+      db.run(
+        `INSERT INTO ingredient_stock (ingredientId, quantity, unit, expiryDate)
+         VALUES (?, ?, ?, ?)`,
+        [stock.ingredientId, stock.quantity, stock.unit, stock.expiryDate],
+        function(this: any, err: any) {
+          if (err) reject(err);
+          else resolve({ id: this.lastID });
+        }
+      );
+    });
+    return result.id;
+  } catch (error) {
+    console.error('Error adding stock:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('stock:update', async (_, id: number, stock: any) => {
+  try {
+    await runAsync(
+      `UPDATE ingredient_stock 
+       SET quantity = ?, unit = ?, expiryDate = ?
+       WHERE id = ?`,
+      [stock.quantity, stock.unit, stock.expiryDate, id]
+    );
+  } catch (error) {
+    console.error('Error updating stock:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('stock:delete', async (_, id: number) => {
+  try {
+    await runAsync('DELETE FROM ingredient_stock WHERE id = ?', [id]);
+  } catch (error) {
+    console.error('Error deleting stock:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('stock:getExpiring', async () => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    return await allAsync<any>(`
+      SELECT s.*, i.name, i.category
+      FROM ingredient_stock s
+      JOIN ingredients i ON s.ingredientId = i.id
+      WHERE s.expiryDate BETWEEN ? AND ?
+      ORDER BY s.expiryDate ASC
+    `, [today, sevenDaysFromNow]);
+  } catch (error) {
+    console.error('Error fetching expiring stock:', error);
+    throw error;
+  }
+});
+
 app.on('ready', async () => {
   try {
     await initializeDatabase();

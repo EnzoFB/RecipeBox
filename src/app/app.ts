@@ -8,6 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { RecipeSearchComponent } from './features/recipes/recipe-search/recipe-search.component';
 import { RecipesComponent } from './features/recipes/recipes.component';
 import { IngredientsComponent } from './features/ingredients/ingredients.component';
+import { StockComponent } from './features/ingredients/stock/stock.component';
 
 @Component({
   selector: 'app-root',
@@ -20,15 +21,16 @@ import { IngredientsComponent } from './features/ingredients/ingredients.compone
     MatListModule,
     RecipesComponent,
     IngredientsComponent,
+    StockComponent,
     RecipeSearchComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly currentPage = signal<'recipes' | 'ingredients' | 'search'>('recipes');
+  protected readonly currentPage = signal<'recipes' | 'ingredients' | 'stock' | 'search'>('recipes');
 
-  navigateTo(page: 'recipes' | 'ingredients' | 'search'): void {
+  navigateTo(page: 'recipes' | 'ingredients' | 'stock' | 'search'): void {
     this.currentPage.set(page);
   }
 }

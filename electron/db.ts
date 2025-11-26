@@ -96,6 +96,22 @@ function createTables(): Promise<void> {
         }
       );
 
+      // Table ingredient_stock (stock management)
+      db!.run(
+        `CREATE TABLE IF NOT EXISTS ingredient_stock (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          ingredientId INTEGER NOT NULL,
+          quantity REAL NOT NULL,
+          unit TEXT NOT NULL,
+          expiryDate DATE NOT NULL,
+          addedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE
+        )`,
+        (err) => {
+          if (err) reject(err);
+        }
+      );
+
       // Add image column if it doesn't exist (migration)
       db!.run(
         `ALTER TABLE recipes ADD COLUMN image TEXT`,

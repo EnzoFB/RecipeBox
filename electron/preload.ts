@@ -16,4 +16,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     update: (id: number, ingredient: any) => ipcRenderer.invoke('ingredients:update', id, ingredient),
     delete: (id: number) => ipcRenderer.invoke('ingredients:delete', id),
   },
+  // Stock APIs
+  stock: {
+    getAll: () => ipcRenderer.invoke('stock:getAll'),
+    add: (stock: any) => ipcRenderer.invoke('stock:add', stock),
+    update: (id: number, stock: any) => ipcRenderer.invoke('stock:update', id, stock),
+    delete: (id: number) => ipcRenderer.invoke('stock:delete', id),
+    getExpiring: () => ipcRenderer.invoke('stock:getExpiring'),
+  },
 });

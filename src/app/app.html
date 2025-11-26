@@ -28,6 +28,15 @@
 
       <button
         mat-list-item
+        (click)="navigateTo('stock'); sidenav.toggle()"
+        [class.active]="currentPage() === 'stock'"
+      >
+        <mat-icon matListItemIcon>inventory_2</mat-icon>
+        <span matListItemTitle>Stock</span>
+      </button>
+
+      <button
+        mat-list-item
         (click)="navigateTo('search'); sidenav.toggle()"
         [class.active]="currentPage() === 'search'"
       >
@@ -40,6 +49,7 @@
   <mat-sidenav-content class="main-content">
     <app-recipes *ngIf="currentPage() === 'recipes'"></app-recipes>
     <app-ingredients *ngIf="currentPage() === 'ingredients'"></app-ingredients>
+    <app-stock *ngIf="currentPage() === 'stock'"></app-stock>
     <app-recipe-search *ngIf="currentPage() === 'search'"></app-recipe-search>
   </mat-sidenav-content>
 </mat-sidenav-container>

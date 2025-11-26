@@ -2,175 +2,180 @@ import sqlite3 from 'sqlite3';
 import * as path from 'node:path';
 import { app } from 'electron';
 
-let db: sqlite3.Database | null = null;
+// ============================================================================
+// Types & Constants
+// ============================================================================
 
-export function initializeDatabase(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const dbPath = path.join(app.getPath('userData'), 'recipes.db');
-    
-    db = new sqlite3.Database(dbPath, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        console.log('Connected to SQLite database:', dbPath);
-        createTables().then(() => loadMockData()).then(resolve).catch(reject);
-      }
+interface RunAsyncOptions {
+  sql: string;
+  params?: any[];
+}
+
+interface TableSchema {
+  name: string;
+  sql: string;
+}
+
+// ============================================================================
+// Database Schemas
+// ============================================================================
+
+const SCHEMAS: Record<string, TableSchema> = {
+  ingredients: {
+    name: 'ingredients',
+    sql: `CREATE TABLE IF NOT EXISTS ingredients (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE,
+      category TEXT DEFAULT 'Autre',
+      unit TEXT,
+      image TEXT,
+      calories INTEGER,
+      protein REAL,
+      carbs REAL,
+      fat REAL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`
+  },
+  recipes: {
+    name: 'recipes',
+    sql: `CREATE TABLE IF NOT EXISTS recipes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT,
+      category TEXT,
+      image TEXT,
+      prepTime INTEGER,
+      cookTime INTEGER,
+      servings INTEGER,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`
+  },
+  recipe_ingredients: {
+    name: 'recipe_ingredients',
+    sql: `CREATE TABLE IF NOT EXISTS recipe_ingredients (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      recipeId INTEGER NOT NULL,
+      ingredientId INTEGER NOT NULL,
+      quantity REAL NOT NULL,
+      unit TEXT,
+      FOREIGN KEY (recipeId) REFERENCES recipes(id) ON DELETE CASCADE,
+      FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE,
+      UNIQUE(recipeId, ingredientId)
+    )`
+  },
+  recipe_steps: {
+    name: 'recipe_steps',
+    sql: `CREATE TABLE IF NOT EXISTS recipe_steps (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      recipeId INTEGER NOT NULL,
+      stepOrder INTEGER NOT NULL,
+      description TEXT NOT NULL,
+      FOREIGN KEY (recipeId) REFERENCES recipes(id) ON DELETE CASCADE
+    )`
+  },
+  ingredient_stock: {
+    name: 'ingredient_stock',
+    sql: `CREATE TABLE IF NOT EXISTS ingredient_stock (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ingredientId INTEGER NOT NULL,
+      quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      expiryDate DATE NOT NULL,
+      addedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE
+    )`
+  }
+};
+
+const MIGRATIONS = [
+  { table: 'recipes', column: 'image', type: 'TEXT' },
+  { table: 'ingredients', column: 'image', type: 'TEXT' }
+];
+
+// ============================================================================
+// Database Class
+// ============================================================================
+
+class DatabaseManager {
+  private db: sqlite3.Database | null = null;
+  private dbPath: string;
+
+  constructor() {
+    this.dbPath = path.join(app.getPath('userData'), 'recipes.db');
+  }
+
+  async initialize(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.db = new sqlite3.Database(this.dbPath, (err) => {
+        if (err) {
+          this.logError('Failed to connect to database', err);
+          reject(err);
+        } else {
+          this.logInfo(`Connected to SQLite database: ${this.dbPath}`);
+          this.createTables()
+            .then(() => this.loadMockData())
+            .then(resolve)
+            .catch(reject);
+        }
+      });
     });
-  });
-}
+  }
 
-function createTables(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (!db) {
-      reject(new Error('Database not initialized'));
-      return;
-    }
-
-    db.serialize(() => {
-      // Table ingredients
-      db!.run(
-        `CREATE TABLE IF NOT EXISTS ingredients (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL UNIQUE,
-          category TEXT DEFAULT 'Autre',
-          unit TEXT,
-          image TEXT,
-          calories INTEGER,
-          protein REAL,
-          carbs REAL,
-          fat REAL,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`,
-        (err) => {
-          if (err) reject(err);
-        }
-      );
-
-      // Table recipes
-      db!.run(
-        `CREATE TABLE IF NOT EXISTS recipes (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          description TEXT,
-          category TEXT,
-          image TEXT,
-          prepTime INTEGER,
-          cookTime INTEGER,
-          servings INTEGER,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-          updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`,
-        (err) => {
-          if (err) reject(err);
-        }
-      );
-
-      // Table recipe_ingredients (junction table)
-      db!.run(
-        `CREATE TABLE IF NOT EXISTS recipe_ingredients (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          recipeId INTEGER NOT NULL,
-          ingredientId INTEGER NOT NULL,
-          quantity REAL NOT NULL,
-          unit TEXT,
-          FOREIGN KEY (recipeId) REFERENCES recipes(id) ON DELETE CASCADE,
-          FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE,
-          UNIQUE(recipeId, ingredientId)
-        )`,
-        (err) => {
-          if (err) reject(err);
-        }
-      );
-
-      // Table recipe_steps
-      db!.run(
-        `CREATE TABLE IF NOT EXISTS recipe_steps (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          recipeId INTEGER NOT NULL,
-          stepOrder INTEGER NOT NULL,
-          description TEXT NOT NULL,
-          FOREIGN KEY (recipeId) REFERENCES recipes(id) ON DELETE CASCADE
-        )`,
-        (err) => {
-          if (err) reject(err);
-        }
-      );
-
-      // Table ingredient_stock (stock management)
-      db!.run(
-        `CREATE TABLE IF NOT EXISTS ingredient_stock (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          ingredientId INTEGER NOT NULL,
-          quantity REAL NOT NULL,
-          unit TEXT NOT NULL,
-          expiryDate DATE NOT NULL,
-          addedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE
-        )`,
-        (err) => {
-          if (err) reject(err);
-        }
-      );
-
-      // Add image column if it doesn't exist (migration)
-      db!.run(
-        `ALTER TABLE recipes ADD COLUMN image TEXT`,
-        (err) => {
-          // Ignore error if column already exists
-          if (err && err.message.includes('duplicate column')) {
-            console.log('Image column already exists in recipes');
-          } else if (err) {
-            console.error('Error adding image column to recipes:', err);
-          } else {
-            console.log('Image column added successfully to recipes');
-          }
-        }
-      );
-
-      // Add image column to ingredients if it doesn't exist (migration)
-      db!.run(
-        `ALTER TABLE ingredients ADD COLUMN image TEXT`,
-        (err) => {
-          // Ignore error if column already exists
-          if (err && err.message.includes('duplicate column')) {
-            console.log('Image column already exists in ingredients');
-          } else if (err) {
-            console.error('Error adding image column to ingredients:', err);
-          } else {
-            console.log('Image column added successfully to ingredients');
-          }
-          resolve();
-        }
-      );
-    });
-  });
-}
-
-function loadMockData(): Promise<void> {
-  return loadMockDataInternal();
-}
-
-async function loadMockDataInternal(): Promise<void> {
-  try {
-    if (!db) {
+  private async createTables(): Promise<void> {
+    if (!this.db) {
       throw new Error('Database not initialized');
     }
 
-    // Check if data already exists
-    const recipeCount = await getAsync<{ count: number }>(
-      'SELECT COUNT(*) as count FROM recipes'
-    );
-
-    if (recipeCount && recipeCount.count > 0) {
-      console.log('Mock data already exists, skipping insertion');
-      return;
+    // Create main tables
+    for (const schema of Object.values(SCHEMAS)) {
+      await this.runAsync({ sql: schema.sql });
     }
 
-    console.log('Loading mock data...');
+    // Apply migrations
+    for (const migration of MIGRATIONS) {
+      await this.applyMigration(migration.table, migration.column, migration.type);
+    }
+  }
 
-    // Insert ingredients
-    const ingredients = [
+  private async applyMigration(table: string, column: string, type: string): Promise<void> {
+    const sql = `ALTER TABLE ${table} ADD COLUMN ${column} ${type}`;
+    try {
+      await this.runAsync({ sql });
+      this.logInfo(`✓ Migration applied: Added ${column} to ${table}`);
+    } catch (err: any) {
+      if (err.message?.includes('duplicate column')) {
+        this.logInfo(`✓ Column ${column} already exists in ${table}`);
+      } else {
+        this.logError(`Migration failed for ${table}.${column}`, err);
+      }
+    }
+  }
+
+  private async loadMockData(): Promise<void> {
+    try {
+      const recipeCount = await this.getAsync<{ count: number }>(
+        'SELECT COUNT(*) as count FROM recipes'
+      );
+
+      if (recipeCount && recipeCount.count > 0) {
+        this.logInfo('Mock data already exists, skipping insertion');
+        return;
+      }
+
+      this.logInfo('Loading mock data...');
+      const ingredientIds = await this.insertMockIngredients();
+      await this.insertMockRecipes(ingredientIds);
+      this.logInfo('✓ Mock data loaded successfully');
+    } catch (error) {
+      this.logError('Error loading mock data', error);
+      throw error;
+    }
+  }
+
+  private async insertMockIngredients(): Promise<Record<string, number>> {
+    const mockIngredients = [
       { name: 'Pâtes', category: 'Féculents', unit: 'g', calories: 131, protein: 5, carbs: 25, fat: 1.1 },
       { name: 'Lard', category: 'Protéines', unit: 'g', calories: 541, protein: 37, carbs: 0, fat: 43 },
       { name: 'Œuf', category: 'Produits laitiers', unit: 'unité', calories: 155, protein: 13, carbs: 1.1, fat: 11 },
@@ -182,256 +187,310 @@ async function loadMockDataInternal(): Promise<void> {
       { name: 'Crème fraîche', category: 'Produits laitiers', unit: 'g', calories: 340, protein: 2.5, carbs: 3, fat: 36 },
       { name: 'Champignons', category: 'Légumes', unit: 'g', calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3 },
       { name: 'Oignon', category: 'Légumes', unit: 'g', calories: 40, protein: 1.1, carbs: 9, fat: 0.1 },
-      { name: 'Ail', category: 'Condiments', unit: 'g', calories: 149, protein: 6.4, carbs: 33, fat: 0.5 },
+      { name: 'Ail', category: 'Condiments', unit: 'g', calories: 149, protein: 6.4, carbs: 33, fat: 0.5 }
     ];
 
     const ingredientIds: Record<string, number> = {};
 
-    for (const ing of ingredients) {
-      const id = await insertIngredient(ing);
+    for (const ing of mockIngredients) {
+      const id = await this.insertIngredient(ing);
       ingredientIds[ing.name] = id;
     }
 
-    // Insert recipes
-    await insertCarbonara(ingredientIds);
-    await insertNicoise(ingredientIds);
-    await insertChampignons(ingredientIds);
-
-    console.log('Mock data loaded successfully');
-  } catch (error) {
-    console.error('Error loading mock data:', error);
-    throw error;
+    return ingredientIds;
   }
-}
 
-function insertIngredient(ingredient: any): Promise<number> {
-  return new Promise((resolve, reject) => {
-    db!.run(
-      `INSERT OR IGNORE INTO ingredients (name, category, unit, calories, protein, carbs, fat)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [ingredient.name, ingredient.category, ingredient.unit, ingredient.calories, ingredient.protein, ingredient.carbs, ingredient.fat],
-      function insertCb(this: any, err: any) {
+  private async insertIngredient(ingredient: any): Promise<number> {
+    const sql = `INSERT OR IGNORE INTO ingredients (name, category, unit, calories, protein, carbs, fat)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    
+    await this.runAsync({
+      sql,
+      params: [
+        ingredient.name,
+        ingredient.category,
+        ingredient.unit,
+        ingredient.calories,
+        ingredient.protein,
+        ingredient.carbs,
+        ingredient.fat
+      ]
+    });
+
+    const row = await this.getAsync<{ id: number }>(
+      'SELECT id FROM ingredients WHERE name = ?',
+      [ingredient.name]
+    );
+
+    return row?.id || 0;
+  }
+
+  private async insertMockRecipes(ingredientIds: Record<string, number>): Promise<void> {
+    await this.insertCarbonara(ingredientIds);
+    await this.insertNicoise(ingredientIds);
+    await this.insertChampignons(ingredientIds);
+  }
+
+  private async insertCarbonara(ingredientIds: Record<string, number>): Promise<void> {
+    const recipeId = await this.insertRecipe(
+      'Pâtes Carbonara',
+      'Un classique italien savoureux avec pâtes, lard et œufs',
+      'Plats',
+      10,
+      20,
+      4
+    );
+
+    const ingredients = [
+      { id: ingredientIds['Pâtes'], quantity: 400, unit: 'g' },
+      { id: ingredientIds['Lard'], quantity: 200, unit: 'g' },
+      { id: ingredientIds['Œuf'], quantity: 3, unit: 'unité' },
+      { id: ingredientIds['Fromage Parmesan'], quantity: 100, unit: 'g' }
+    ];
+
+    await this.linkRecipeIngredients(recipeId, ingredients);
+
+    const steps = [
+      'Faire bouillir l\'eau salée',
+      'Cuire les pâtes al dente',
+      'Faire cuire le lard jusqu\'à croustillant',
+      'Mélanger les œufs avec le fromage râpé',
+      'Combiner les pâtes avec la sauce et le lard'
+    ];
+
+    await this.insertRecipeSteps(recipeId, steps);
+  }
+
+  private async insertNicoise(ingredientIds: Record<string, number>): Promise<void> {
+    const recipeId = await this.insertRecipe(
+      'Salade Niçoise',
+      'Une salade fraîche et légère avec tomates, anchois et olives',
+      'Salades',
+      15,
+      0,
+      2
+    );
+
+    const ingredients = [
+      { id: ingredientIds['Laitue'], quantity: 200, unit: 'g' },
+      { id: ingredientIds['Tomate'], quantity: 200, unit: 'g' },
+      { id: ingredientIds['Anchois'], quantity: 100, unit: 'g' },
+      { id: ingredientIds['Olives'], quantity: 100, unit: 'g' },
+      { id: ingredientIds['Œuf'], quantity: 2, unit: 'unité' }
+    ];
+
+    await this.linkRecipeIngredients(recipeId, ingredients);
+
+    const steps = [
+      'Laver et sécher la laitue',
+      'Couper les tomates en quartiers',
+      'Cuire les œufs durs',
+      'Assembler la salade avec laitue, tomates, œufs, anchois et olives',
+      'Verser l\'huile d\'olive et le vinaigre'
+    ];
+
+    await this.insertRecipeSteps(recipeId, steps);
+  }
+
+  private async insertChampignons(ingredientIds: Record<string, number>): Promise<void> {
+    const recipeId = await this.insertRecipe(
+      'Champignons à la Crème',
+      'Champignons sautés dans une sauce crème délicieuse',
+      'Plats',
+      10,
+      15,
+      3
+    );
+
+    const ingredients = [
+      { id: ingredientIds['Champignons'], quantity: 500, unit: 'g' },
+      { id: ingredientIds['Oignon'], quantity: 1, unit: 'unité' },
+      { id: ingredientIds['Ail'], quantity: 3, unit: 'g' },
+      { id: ingredientIds['Crème fraîche'], quantity: 200, unit: 'g' }
+    ];
+
+    await this.linkRecipeIngredients(recipeId, ingredients);
+
+    const steps = [
+      'Nettoyer et couper les champignons',
+      'Hacher l\'oignon et l\'ail',
+      'Faire revenir l\'oignon et l\'ail',
+      'Ajouter les champignons et cuire 5 minutes',
+      'Verser la crème fraîche et cuire 5 minutes de plus'
+    ];
+
+    await this.insertRecipeSteps(recipeId, steps);
+  }
+
+  private async insertRecipe(
+    name: string,
+    description: string,
+    category: string,
+    prepTime: number,
+    cookTime: number,
+    servings: number
+  ): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const sql = `INSERT INTO recipes (name, description, category, prepTime, cookTime, servings)
+                   VALUES (?, ?, ?, ?, ?, ?)`;
+
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      this.db.run(sql, [name, description, category, prepTime, cookTime, servings], function (err) {
         if (err) {
           reject(err);
         } else {
-          getAsync<{ id: number }>('SELECT id FROM ingredients WHERE name = ?', [ingredient.name])
-            .then((row) => {
-              if (row) {
-                resolve(row.id);
-              } else {
-                resolve(0);
-              }
-            })
-            .catch(reject);
+          resolve(this.lastID);
         }
-      }
-    );
-  });
-}
-
-function insertRecipe(name: string, description: string, category: string, prepTime: number, cookTime: number, servings: number): Promise<number> {
-  return new Promise((resolve, reject) => {
-    db!.run(
-      `INSERT INTO recipes (name, description, category, prepTime, cookTime, servings)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, description, category, prepTime, cookTime, servings],
-      function insertCb(this: any, err: any) {
-        if (err) reject(err);
-        else resolve(this.lastID);
-      }
-    );
-  });
-}
-
-async function insertCarbonara(ingredientIds: Record<string, number>): Promise<void> {
-  const carbonaraId = await insertRecipe(
-    'Pâtes Carbonara',
-    'Un classique italien savoureux avec pâtes, lard et œufs',
-    'Plats',
-    10,
-    20,
-    4
-  );
-
-  const ingredients = [
-    { id: ingredientIds['Pâtes'], quantity: 400, unit: 'g' },
-    { id: ingredientIds['Lard'], quantity: 200, unit: 'g' },
-    { id: ingredientIds['Œuf'], quantity: 3, unit: 'unité' },
-    { id: ingredientIds['Fromage Parmesan'], quantity: 100, unit: 'g' },
-  ];
-
-  for (const ing of ingredients) {
-    await runAsync(
-      'INSERT INTO recipe_ingredients (recipeId, ingredientId, quantity, unit) VALUES (?, ?, ?, ?)',
-      [carbonaraId, ing.id, ing.quantity, ing.unit]
-    );
+      });
+    });
   }
 
-  const steps = [
-    'Faire bouillir l\'eau salée',
-    'Cuire les pâtes al dente',
-    'Faire cuire le lard jusqu\'à croustillant',
-    'Mélanger les œufs avec le fromage râpé',
-    'Combiner les pâtes avec la sauce et le lard',
-  ];
-
-  for (let i = 0; i < steps.length; i++) {
-    await runAsync(
-      'INSERT INTO recipe_steps (recipeId, stepOrder, description) VALUES (?, ?, ?)',
-      [carbonaraId, i + 1, steps[i]]
-    );
-  }
-}
-
-async function insertNicoise(ingredientIds: Record<string, number>): Promise<void> {
-  const nicoiseId = await insertRecipe(
-    'Salade Niçoise',
-    'Une salade fraîche et légère avec tomates, anchois et olives',
-    'Salades',
-    15,
-    0,
-    2
-  );
-
-  const ingredients = [
-    { id: ingredientIds['Laitue'], quantity: 200, unit: 'g' },
-    { id: ingredientIds['Tomate'], quantity: 200, unit: 'g' },
-    { id: ingredientIds['Anchois'], quantity: 100, unit: 'g' },
-    { id: ingredientIds['Olives'], quantity: 100, unit: 'g' },
-    { id: ingredientIds['Œuf'], quantity: 2, unit: 'unité' },
-  ];
-
-  for (const ing of ingredients) {
-    await runAsync(
-      'INSERT INTO recipe_ingredients (recipeId, ingredientId, quantity, unit) VALUES (?, ?, ?, ?)',
-      [nicoiseId, ing.id, ing.quantity, ing.unit]
-    );
-  }
-
-  const steps = [
-    'Laver et sécher la laitue',
-    'Couper les tomates en quartiers',
-    'Cuire les œufs durs',
-    'Assembler la salade avec laitue, tomates, œufs, anchois et olives',
-    'Verser l\'huile d\'olive et le vinaigre',
-  ];
-
-  for (let i = 0; i < steps.length; i++) {
-    await runAsync(
-      'INSERT INTO recipe_steps (recipeId, stepOrder, description) VALUES (?, ?, ?)',
-      [nicoiseId, i + 1, steps[i]]
-    );
-  }
-}
-
-async function insertChampignons(ingredientIds: Record<string, number>): Promise<void> {
-  const champignonsId = await insertRecipe(
-    'Champignons à la Crème',
-    'Champignons sautés dans une sauce crème délicieuse',
-    'Plats',
-    10,
-    15,
-    3
-  );
-
-  const ingredients = [
-    { id: ingredientIds['Champignons'], quantity: 500, unit: 'g' },
-    { id: ingredientIds['Oignon'], quantity: 1, unit: 'unité' },
-    { id: ingredientIds['Ail'], quantity: 3, unit: 'g' },
-    { id: ingredientIds['Crème fraîche'], quantity: 200, unit: 'g' },
-  ];
-
-  for (const ing of ingredients) {
-    await runAsync(
-      'INSERT INTO recipe_ingredients (recipeId, ingredientId, quantity, unit) VALUES (?, ?, ?, ?)',
-      [champignonsId, ing.id, ing.quantity, ing.unit]
-    );
-  }
-
-  const steps = [
-    'Nettoyer et couper les champignons',
-    'Hacher l\'oignon et l\'ail',
-    'Faire revenir l\'oignon et l\'ail',
-    'Ajouter les champignons et cuire 5 minutes',
-    'Verser la crème fraîche et cuire 5 minutes de plus',
-  ];
-
-  for (let i = 0; i < steps.length; i++) {
-    await runAsync(
-      'INSERT INTO recipe_steps (recipeId, stepOrder, description) VALUES (?, ?, ?)',
-      [champignonsId, i + 1, steps[i]]
-    );
-  }
-}
-
-export function getDatabase(): sqlite3.Database | null {
-  return db;
-}
-
-export function runAsync(sql: string, params: any[] = []): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (!db) {
-      reject(new Error('Database not initialized'));
-      return;
+  private async linkRecipeIngredients(
+    recipeId: number,
+    ingredients: Array<{ id: number; quantity: number; unit: string }>
+  ): Promise<void> {
+    for (const ing of ingredients) {
+      await this.runAsync({
+        sql: 'INSERT INTO recipe_ingredients (recipeId, ingredientId, quantity, unit) VALUES (?, ?, ?, ?)',
+        params: [recipeId, ing.id, ing.quantity, ing.unit]
+      });
     }
+  }
 
-    db.run(sql, params, function (err) {
-      if (err) {
-        reject(err);
+  private async insertRecipeSteps(recipeId: number, steps: string[]): Promise<void> {
+    for (let i = 0; i < steps.length; i++) {
+      await this.runAsync({
+        sql: 'INSERT INTO recipe_steps (recipeId, stepOrder, description) VALUES (?, ?, ?)',
+        params: [recipeId, i + 1, steps[i]]
+      });
+    }
+  }
+
+  async runAsync({ sql, params = [] }: RunAsyncOptions): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      this.db.run(sql, params, function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  async getAsync<T>(sql: string, params: any[] = []): Promise<T | undefined> {
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      this.db.get(sql, params, (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row as T | undefined);
+        }
+      });
+    });
+  }
+
+  async allAsync<T>(sql: string, params: any[] = []): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      this.db.all(sql, params, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve((rows || []) as T[]);
+        }
+      });
+    });
+  }
+
+  async close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.db) {
+        this.db.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            this.db = null;
+            resolve();
+          }
+        });
       } else {
         resolve();
       }
     });
-  });
+  }
+
+  getDatabase(): sqlite3.Database | null {
+    return this.db;
+  }
+
+  private logInfo(message: string): void {
+    console.log(`[DB] ${message}`);
+  }
+
+  private logError(message: string, error: any): void {
+    console.error(`[DB] ${message}:`, error);
+  }
+}
+
+// ============================================================================
+// Singleton Instance & Exports
+// ============================================================================
+
+let dbManager: DatabaseManager | null = null;
+
+export function initializeDatabase(): Promise<void> {
+  dbManager = new DatabaseManager();
+  return dbManager.initialize();
+}
+
+export function getDatabase(): sqlite3.Database | null {
+  return dbManager?.getDatabase() ?? null;
+}
+
+export function runAsync(sql: string, params: any[] = []): Promise<void> {
+  if (!dbManager) {
+    return Promise.reject(new Error('Database not initialized'));
+  }
+  return dbManager.runAsync({ sql, params });
 }
 
 export function getAsync<T>(sql: string, params: any[] = []): Promise<T | undefined> {
-  return new Promise((resolve, reject) => {
-    if (!db) {
-      reject(new Error('Database not initialized'));
-      return;
-    }
-
-    db.get(sql, params, (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(row as T | undefined);
-      }
-    });
-  });
+  if (!dbManager) {
+    return Promise.reject(new Error('Database not initialized'));
+  }
+  return dbManager.getAsync<T>(sql, params);
 }
 
 export function allAsync<T>(sql: string, params: any[] = []): Promise<T[]> {
-  return new Promise((resolve, reject) => {
-    if (!db) {
-      reject(new Error('Database not initialized'));
-      return;
-    }
-
-    db.all(sql, params, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve((rows || []) as T[]);
-      }
-    });
-  });
+  if (!dbManager) {
+    return Promise.reject(new Error('Database not initialized'));
+  }
+  return dbManager.allAsync<T>(sql, params);
 }
 
 export function closeDatabase(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (db) {
-      db.close((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          db = null;
-          resolve();
-        }
-      });
-    } else {
-      resolve();
-    }
-  });
+  if (!dbManager) {
+    return Promise.resolve();
+  }
+  return dbManager.close();
 }
+

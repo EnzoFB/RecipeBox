@@ -10,7 +10,7 @@
     "build:electron": "tsc -p tsconfig.electron.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --code-coverage --browsers=ChromeHeadless",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
     "lint:html": "htmlhint src/**/*.html",
     "lint:html:fix": "prettier --write src/**/*.html",
     "package": "npm run build && npm run build:electron && electron-forge package",

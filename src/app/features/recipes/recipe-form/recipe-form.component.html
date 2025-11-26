@@ -3,256 +3,275 @@
 </h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()" mat-dialog-content class="recipe-form">
-    <div class="form-section">
-      <h3>Informations générales</h3>
+  <!-- Section: Informations générales -->
+  <div class="form-section">
+    <h3>Informations générales</h3>
 
-      <div class="form-group">
-        <label for="name">Nom de la recette *</label>
-        <input
-          id="name"
-          type="text"
-          formControlName="name"
-          class="form-control"
-          [class.input-error]="form.get('name')?.invalid && form.get('name')?.touched"
-        />
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nom de la recette *</mat-label>
+        <input matInput formControlName="name" />
         @if (form.get('name')?.invalid && form.get('name')?.touched) {
-          <span class="error">{{ getFieldError('name') }}</span>
+          <mat-error>Le nom est requis (min. 3 caractères)</mat-error>
         }
-      </div>
+      </mat-form-field>
+    </div>
 
-      <div class="form-group">
-        <label for="description">Description *</label>
-        <textarea
-          id="description"
-          formControlName="description"
-          class="form-control"
-          rows="3"
-          [class.input-error]="form.get('description')?.invalid && form.get('description')?.touched"
-        ></textarea>
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description *</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
         @if (form.get('description')?.invalid && form.get('description')?.touched) {
-          <span class="error">{{ getFieldError('description') }}</span>
+          <mat-error>La description est requise</mat-error>
         }
-      </div>
+      </mat-form-field>
+    </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="category">Catégorie *</label>
-          <select
-            id="category"
-            formControlName="category"
-            class="form-control"
-            [class.input-error]="form.get('category')?.invalid && form.get('category')?.touched"
-          >
-            <option value="">-- Sélectionner --</option>
-            <option value="Plats">Plats</option>
-            <option value="Salades">Salades</option>
-            <option value="Desserts">Desserts</option>
-            <option value="Soupes">Soupes</option>
-            <option value="Petit-déjeuner">Petit-déjeuner</option>
-            <option value="Autre">Autre</option>
-          </select>
+    <div class="form-row">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Catégorie *</mat-label>
+          <mat-select formControlName="category">
+            <mat-option value="">-- Sélectionner --</mat-option>
+            <mat-option value="Plats">Plats</mat-option>
+            <mat-option value="Salades">Salades</mat-option>
+            <mat-option value="Desserts">Desserts</mat-option>
+            <mat-option value="Soupes">Soupes</mat-option>
+            <mat-option value="Petit-déjeuner">Petit-déjeuner</mat-option>
+            <mat-option value="Autre">Autre</mat-option>
+          </mat-select>
           @if (form.get('category')?.invalid && form.get('category')?.touched) {
-            <span class="error">{{ getFieldError('category') }}</span>
+            <mat-error>La catégorie est requise</mat-error>
           }
-        </div>
-
-        <div class="form-group">
-          <label for="servings">Portions *</label>
-          <input
-            id="servings"
-            type="number"
-            formControlName="servings"
-            class="form-control"
-            [class.input-error]="form.get('servings')?.invalid && form.get('servings')?.touched"
-          />
-          @if (form.get('servings')?.invalid && form.get('servings')?.touched) {
-            <span class="error">{{ getFieldError('servings') }}</span>
-          }
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="prepTime">Temps de préparation (min) *</label>
-          <input
-            id="prepTime"
-            type="number"
-            formControlName="prepTime"
-            class="form-control"
-            [class.input-error]="form.get('prepTime')?.invalid && form.get('prepTime')?.touched"
-          />
-          @if (form.get('prepTime')?.invalid && form.get('prepTime')?.touched) {
-            <span class="error">{{ getFieldError('prepTime') }}</span>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="cookTime">Temps de cuisson (min) *</label>
-          <input
-            id="cookTime"
-            type="number"
-            formControlName="cookTime"
-            class="form-control"
-            [class.input-error]="form.get('cookTime')?.invalid && form.get('cookTime')?.touched"
-          />
-          @if (form.get('cookTime')?.invalid && form.get('cookTime')?.touched) {
-            <span class="error">{{ getFieldError('cookTime') }}</span>
-          }
-        </div>
+        </mat-form-field>
       </div>
 
       <div class="form-group">
-        <label for="image">Image de la recette</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Portions *</mat-label>
+          <input matInput type="number" formControlName="servings" min="1" />
+          @if (form.get('servings')?.invalid && form.get('servings')?.touched) {
+            <mat-error>Minimum 1 portion</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
 
-        @if (imagePreview()) {
-          <div class="image-preview">
-            <img [src]="imagePreview()" alt="Aperçu" />
-            <button type="button" class="btn-remove-image" (click)="removeImage()">
-              Supprimer l'image
-            </button>
-          </div>
-        } @else {
+    <div class="form-row">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Temps de préparation (min) *</mat-label>
+          <input matInput type="number" formControlName="prepTime" min="0" />
+          @if (form.get('prepTime')?.invalid && form.get('prepTime')?.touched) {
+            <mat-error>Valeur invalide</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Temps de cuisson (min) *</mat-label>
+          <input matInput type="number" formControlName="cookTime" min="0" />
+          @if (form.get('cookTime')?.invalid && form.get('cookTime')?.touched) {
+            <mat-error>Valeur invalide</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Image -->
+  <div class="form-section">
+    <h3>Image de la recette</h3>
+    <div class="image-upload">
+      @if (imagePreview()) {
+        <div class="image-preview">
+          <img [src]="imagePreview()" alt="Prévisualisation" />
+          <button
+            type="button"
+            mat-stroked-button
+            color="warn"
+            (click)="removeImage()"
+          >
+            Supprimer l'image
+          </button>
+        </div>
+      } @else {
+        <label class="upload-label">
           <input
-            id="image"
             type="file"
             accept="image/*"
             (change)="onImageSelected($event)"
-            class="form-control"
+            hidden
           />
+          <span class="upload-btn">📷 Ajouter une image</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <!-- Section: Ingrédients -->
+  <div class="form-section">
+    <div class="section-header">
+      <h3>Ingrédients *</h3>
+      <span class="section-hint">{{ selectedIngredients().length }} ajouté(s)</span>
+    </div>
+
+    <div class="add-ingredient-form">
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Ingrédient</mat-label>
+            <mat-select formControlName="ingredientId">
+              <mat-option value="">-- Sélectionner --</mat-option>
+              @for (ingredient of availableIngredients(); track ingredient.id) {
+                <mat-option [value]="ingredient.id">
+                  {{ ingredient.name }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Quantité</mat-label>
+            <input matInput type="number" formControlName="quantity" step="0.1" min="0.1" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Unité</mat-label>
+            <mat-select formControlName="unit">
+              <mat-option value="g">g</mat-option>
+              <mat-option value="kg">kg</mat-option>
+              <mat-option value="ml">ml</mat-option>
+              <mat-option value="l">l</mat-option>
+              <mat-option value="c">c. à soupe</mat-option>
+              <mat-option value="cc">c. à café</mat-option>
+              <mat-option value="unité">unité</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        mat-raised-button
+        color="accent"
+        (click)="addIngredient()"
+        [disabled]="!isIngredientFieldsValid()"
+        class="btn-add-ingredient"
+      >
+        + Ajouter l'ingrédient
+      </button>
+    </div>
+
+    @if (selectedIngredients().length > 0) {
+      <div class="ingredients-list">
+        @for (ingredient of selectedIngredients(); track ingredient.ingredientId) {
+          <div class="ingredient-item">
+            <div class="ingredient-content">
+              <span class="ingredient-name">{{ getIngredientName(ingredient.ingredientId) }}</span>
+              <span class="ingredient-quantity">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+            </div>
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              (click)="removeIngredient(ingredient.ingredientId)"
+              matTooltip="Supprimer"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         }
       </div>
+    }
+
+    @if (selectedIngredients().length === 0) {
+      <div class="validation-hint error">
+        <mat-icon>warning</mat-icon>
+        <span>Au moins un ingrédient est requis</span>
+      </div>
+    }
+  </div>
+
+  <!-- Section: Étapes -->
+  <div class="form-section">
+    <div class="section-header">
+      <h3>Étapes de la recette *</h3>
+      <span class="section-hint">{{ steps().length }} ajoutée(s)</span>
     </div>
 
-    <div class="form-section">
-      <h3>
-        Ingrédients * <span class="section-hint">{{ selectedIngredients().length }} ajouté(s)</span>
-      </h3>
-
-      <div class="add-ingredient">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="ingredientId">Ingrédient</label>
-            <select id="ingredientId" formControlName="ingredientId" class="form-control">
-              <option value="">-- Sélectionner --</option>
-              @for (ingredient of availableIngredients(); track ingredient.id) {
-                <option [value]="ingredient.id">
-                  {{ ingredient.name }}
-                </option>
-              }
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="quantity">Quantité</label>
-            <input
-              id="quantity"
-              type="number"
-              formControlName="quantity"
-              class="form-control"
-              step="0.1"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="unit">Unité</label>
-            <select id="unit" formControlName="unit" class="form-control">
-              <option value="g">g</option>
-              <option value="kg">kg</option>
-              <option value="ml">ml</option>
-              <option value="l">l</option>
-              <option value="c">c. à soupe</option>
-              <option value="cc">c. à café</option>
-              <option value="unité">unité</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="addIngredient()"
-            [disabled]="!isIngredientFieldsValid()"
-          >
-            Ajouter
-          </button>
-        </div>
+    <div class="add-step-form">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nouvelle étape</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="newStep"
+            [ngModelOptions]="{ standalone: true }"
+            rows="2"
+            placeholder="Décrivez l'étape..."
+          ></textarea>
+        </mat-form-field>
       </div>
 
-      @if (selectedIngredients().length > 0) {
-        <div class="ingredients-list">
-          @for (ingredient of selectedIngredients(); track ingredient.ingredientId) {
-            <div class="ingredient-item">
-              <span>{{ getIngredientName(ingredient.ingredientId) }}</span>
-              <span>{{ ingredient.quantity }} {{ ingredient.unit }}</span>
-              <button
-                type="button"
-                class="btn-remove"
-                (click)="removeIngredient(ingredient.ingredientId)"
-              >
-                ✕
-              </button>
-            </div>
-          }
-        </div>
-      }
-
-      @if (selectedIngredients().length === 0) {
-        <div class="validation-hint">
-          <span class="hint-error">Au moins un ingrédient est requis</span>
-        </div>
-      }
-    </div>
-
-    <div class="form-section">
-      <h3>
-        Étapes de la recette * <span class="section-hint">{{ steps().length }} ajoutée(s)</span>
-      </h3>
-
-      <div class="add-step">
-        <input
-          type="text"
-          [(ngModel)]="newStep"
-          [ngModelOptions]="{ standalone: true }"
-          class="form-control"
-          placeholder="Ajouter une étape..."
-        />
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="addStep()"
-          [disabled]="!canAddStep()"
-        >
-          Ajouter une étape
-        </button>
-      </div>
-
-      @if (steps().length > 0) {
-        <ol class="steps-list">
-          @for (step of steps(); track $index) {
-            <li class="step-item">
-              <span>{{ step }}</span>
-              <button type="button" class="btn-remove" (click)="removeStep($index)">✕</button>
-            </li>
-          }
-        </ol>
-      }
-
-      @if (steps().length === 0) {
-        <div class="validation-hint">
-          <span class="hint-error">Au moins une étape est requise</span>
-        </div>
-      }
-    </div>
-
-    <div class="form-actions">
       <button
-        type="submit"
+        type="button"
         mat-raised-button
-        color="primary"
-        [disabled]="!isFormValid()"
-        [title]="!isFormValid() ? 'Veuillez remplir tous les champs requis' : ''"
+        color="accent"
+        (click)="addStep()"
+        [disabled]="!canAddStep()"
+        class="btn-add-step"
       >
-        {{ isEditMode ? 'Modifier' : 'Créer' }} la recette
+        + Ajouter une étape
       </button>
-      <button type="button" mat-button (click)="closeForm()">Annuler</button>
     </div>
-  </form>
+
+    @if (steps().length > 0) {
+      <ol class="steps-list">
+        @for (step of steps(); track $index) {
+          <li class="step-item">
+            <div class="step-content">
+              <span class="step-number">{{ $index + 1 }}</span>
+              <span class="step-text">{{ step }}</span>
+            </div>
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              (click)="removeStep($index)"
+              matTooltip="Supprimer"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        }
+      </ol>
+    }
+
+    @if (steps().length === 0) {
+      <div class="validation-hint error">
+        <mat-icon>warning</mat-icon>
+        <span>Au moins une étape est requise</span>
+      </div>
+    }
+  </div>
+</form>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="closeForm()">Annuler</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="!isFormValid()"
+    [title]="!isFormValid() ? 'Veuillez remplir tous les champs requis' : ''"
+  >
+    {{ isEditMode ? 'Modifier' : 'Créer' }} la recette
+  </button>
+</div>
+

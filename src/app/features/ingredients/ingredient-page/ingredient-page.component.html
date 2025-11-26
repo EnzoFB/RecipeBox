@@ -1,0 +1,150 @@
+<mat-toolbar color="primary" class="page-toolbar">
+  <button mat-icon-button (click)="onCancel()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1>{{ isEditMode() ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}</h1>
+</mat-toolbar>
+
+<div class="container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ingredient-form">
+    <!-- Informations générales -->
+    <div class="form-section">
+      <h2>
+        <mat-icon>info</mat-icon>
+        Informations générales
+      </h2>
+
+      <div class="form-group full-width">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom de l'ingrédient *</mat-label>
+          <input matInput formControlName="name" />
+          @if (form.get('name')?.invalid && form.get('name')?.touched) {
+            <mat-error>Le nom est requis (min. 2 caractères)</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Catégorie *</mat-label>
+            <mat-select formControlName="category">
+              @for (cat of categories; track cat) {
+                <mat-option [value]="cat">{{ cat }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Unité *</mat-label>
+            <mat-select formControlName="unitId">
+              @for (u of units; track u.id) {
+                <mat-option [value]="u.id">{{ u.symbol }} - {{ u.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image -->
+    <div class="form-section">
+      <h2>
+        <mat-icon>image</mat-icon>
+        Image
+      </h2>
+
+      <div class="image-upload">
+        @if (imagePreview()) {
+          <div class="image-preview">
+            <img [src]="imagePreview()" alt="Prévisualisation" />
+            <button
+              type="button"
+              mat-stroked-button
+              color="warn"
+              (click)="removeImage()"
+            >
+              <mat-icon>delete</mat-icon>
+              Supprimer l'image
+            </button>
+          </div>
+        } @else {
+          <label class="upload-label">
+            <input
+              type="file"
+              accept="image/*"
+              (change)="onImageSelected($event)"
+              hidden
+            />
+            <span class="upload-btn">
+              <mat-icon>photo_camera</mat-icon>
+              Ajouter une image
+            </span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <!-- Informations nutritionnelles -->
+    <div class="form-section">
+      <h2>
+        <mat-icon>nutrition</mat-icon>
+        Informations nutritionnelles (pour 100g)
+      </h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Calories (kcal)</mat-label>
+            <input matInput type="number" formControlName="calories" step="0.1" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Protéines (g)</mat-label>
+            <input matInput type="number" formControlName="protein" step="0.1" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Glucides (g)</mat-label>
+            <input matInput type="number" formControlName="carbs" step="0.1" />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Lipides (g)</mat-label>
+            <input matInput type="number" formControlName="fats" step="0.1" />
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="onCancel()"
+      >
+        Annuler
+      </button>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        [disabled]="!form.valid"
+      >
+        <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditMode() ? 'Modifier' : 'Créer' }} l'ingrédient
+      </button>
+    </div>
+  </form>
+</div>

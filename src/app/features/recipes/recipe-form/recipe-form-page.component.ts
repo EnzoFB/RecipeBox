@@ -1,50 +1,59 @@
-import { Component, Inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { Recipe, Ingredient, RecipeFormData } from '../../../core/models';
-import { IngredientService } from '../../../core/services';
+import { IngredientService, RecipeService } from '../../../core/services';
 
 @Component({
-  selector: 'app-recipe-form',
+  selector: 'app-recipe-form-page',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatCardModule,
+    MatProgressSpinnerModule
   ],
-  templateUrl: './recipe-form.component.html',
-  styleUrl: './recipe-form.component.scss',
+  templateUrl: './recipe-form-page.component.html',
+  styleUrl: './recipe-form-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RecipeFormComponent implements OnInit {
+export class RecipeFormPageComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   steps = signal<string[]>([]);
   selectedIngredients = signal<{ ingredientId: number; quantity: number; unit: string }[]>([]);
   availableIngredients = signal<Ingredient[]>([]);
   imagePreview = signal<string | null>(null);
   imageBase64 = signal<string | null>(null);
+  isLoading = signal(false);
+  isEditMode = signal(false);
   newStep = '';
-  isEditMode = false;
+
+  private readonly destroy$ = new Subject<void>();
+  private recipeId: number | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly ingredientService: IngredientService,
-    public dialogRef: MatDialogRef<RecipeFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { recipe: Recipe | null }
+    private readonly recipeService: RecipeService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -60,14 +69,40 @@ export class RecipeFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.ingredientService.getIngredients().subscribe(ingredients => {
-      this.availableIngredients.set(ingredients);
-    });
+    this.isLoading.set(true);
 
-    if (this.data.recipe) {
-      this.isEditMode = true;
-      this.populateForm(this.data.recipe);
+    // Load available ingredients
+    this.ingredientService.getIngredients()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(ingredients => {
+        this.availableIngredients.set(ingredients);
+      });
+
+    // Check if editing
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        if (params['id']) {
+          this.recipeId = Number(params['id']);
+          this.isEditMode.set(true);
+          this.loadRecipe(this.recipeId);
+        } else {
+          this.isLoading.set(false);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadRecipe(id: number): void {
+    const recipe = this.recipeService.getRecipeById(id);
+    if (recipe) {
+      this.populateForm(recipe);
     }
+    this.isLoading.set(false);
   }
 
   private populateForm(recipe: Recipe): void {
@@ -84,9 +119,6 @@ export class RecipeFormComponent implements OnInit {
     if (recipe.image) {
       this.imageBase64.set(recipe.image);
       this.imagePreview.set(recipe.image);
-    } else {
-      this.imageBase64.set(null);
-      this.imagePreview.set(null);
     }
   }
 
@@ -114,6 +146,12 @@ export class RecipeFormComponent implements OnInit {
 
     if (!ingredientId || !quantity || !unit) {
       alert('Veuillez remplir tous les champs d\'ingrédient');
+      return;
+    }
+
+    const exists = this.selectedIngredients().some(ing => ing.ingredientId === Number.parseInt(ingredientId));
+    if (exists) {
+      alert('Cet ingrédient est déjà ajouté');
       return;
     }
 
@@ -160,11 +198,17 @@ export class RecipeFormComponent implements OnInit {
       steps: this.steps()
     };
 
-    this.dialogRef.close(formData);
+    if (this.isEditMode() && this.recipeId) {
+      this.recipeService.updateRecipe(this.recipeId, formData);
+    } else {
+      this.recipeService.addRecipe(formData);
+    }
+
+    this.router.navigate(['/recipes/manage']);
   }
 
-  closeForm(): void {
-    this.dialogRef.close();
+  onCancel(): void {
+    this.router.navigate(['/recipes/manage']);
   }
 
   getIngredientName(ingredientId: number): string {

@@ -10,8 +10,8 @@
     <mat-nav-list>
       <button
         mat-list-item
-        (click)="navigateTo('recipes');"
-        [class.active]="currentPage() === 'recipes'"
+        (click)="navigateTo('recipes')"
+        [class.active]="isActive('recipes')"
       >
         <mat-icon matListItemIcon>menu_book</mat-icon>
         <span matListItemTitle>Mes Recettes</span>
@@ -19,8 +19,8 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('stock');"
-        [class.active]="currentPage() === 'stock'"
+        (click)="navigateTo('stock')"
+        [class.active]="isActive('stock')"
       >
         <mat-icon matListItemIcon>inventory_2</mat-icon>
         <span matListItemTitle>Mon Stock</span>
@@ -30,8 +30,8 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('recipes-management');"
-        [class.active]="currentPage() === 'recipes-management'"
+        (click)="navigateTo('recipes/manage')"
+        [class.active]="isActive('recipes/manage')"
       >
         <mat-icon matListItemIcon>kitchen</mat-icon>
         <span matListItemTitle>Gestion des Recettes</span>
@@ -39,8 +39,8 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('ingredients');"
-        [class.active]="currentPage() === 'ingredients'"
+        (click)="navigateTo('ingredients')"
+        [class.active]="isActive('ingredients')"
       >
         <mat-icon matListItemIcon>restaurant</mat-icon>
         <span matListItemTitle>Gestion des Ingrédients</span>
@@ -49,9 +49,6 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="main-content">
-    @if (currentPage() === 'recipes') { <app-recipes /> }
-    @if (currentPage() === 'recipes-management') { <app-recipes-management /> }
-    @if (currentPage() === 'ingredients') { <app-ingredients /> }
-    @if (currentPage() === 'stock') { <app-stock /> }
+    <router-outlet />
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -1,264 +1,334 @@
 .recipe-form {
-  padding: 2rem;
-
-  .form-header {
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 1rem;
-
-    h2 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: #333;
-    }
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 100%;
 
   .form-section {
     h3 {
+      margin: 0 0 1.5rem 0;
       font-size: 1.1rem;
-      color: #333;
-      margin-bottom: 1.5rem;
-      margin-top: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      color: var(--primary-color, #e91e63);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
 
-      .section-hint {
-        font-size: 0.85rem;
-        color: #999;
-        font-weight: 400;
-      }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0;
+    }
+
+    .section-hint {
+      font-size: 0.85rem;
+      color: #999;
+      font-weight: 400;
+      background: rgba(233, 30, 99, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
     }
   }
 
   .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 
-    label {
-      font-weight: 500;
-      color: #333;
-      font-size: 0.95rem;
-    }
-
-    .form-control {
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      transition: all 0.3s;
-
-      &:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-      }
-
-      &.input-error {
-        border-color: #d32f2f;
-        background-color: rgba(211, 47, 47, 0.05);
-
-        &:focus {
-          box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
-        }
-      }
-
-      &:disabled {
-        background-color: #f5f5f5;
-        color: #999;
-        cursor: not-allowed;
-      }
-    }
-
-    .error {
-      color: #d32f2f;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-  }
-
-  .validation-hint {
-    padding: 0.75rem 1rem;
-    background-color: rgba(211, 47, 47, 0.08);
-    border-radius: 6px;
-    border-left: 3px solid #d32f2f;
-    margin-top: 1rem;
-
-    .hint-error {
-      color: #d32f2f;
-      font-size: 0.9rem;
-      font-weight: 500;
+    mat-form-field {
+      width: 100%;
     }
   }
 
   .form-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .add-ingredient,
-  .add-step {
-    background: #f9f9f9;
-    padding: 1.5rem;
-    border-radius: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
     margin-bottom: 1rem;
 
-    button {
-      align-self: flex-end;
-      margin-top: 0.5rem;
+    .form-group {
+      &.flex-2 {
+        grid-column: 1 / -1;
+      }
     }
   }
 
-  .add-step {
-    display: flex;
-    gap: 1rem;
-
-    input {
-      flex: 1;
-    }
-
-    button {
-      margin-top: 0;
-      white-space: nowrap;
-    }
-  }
-
-  .ingredients-list,
-  .steps-list {
-    background: #f9f9f9;
-    padding: 1rem;
+  // Image Upload Section
+  .image-upload {
+    background: rgba(233, 30, 99, 0.05);
+    padding: 2rem;
     border-radius: 8px;
-    list-style: none;
-    margin: 0;
-    padding: 1rem;
-  }
+    border: 2px dashed var(--primary-color, #e91e63);
+    text-align: center;
+    transition: all 0.3s;
 
-  .ingredient-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    background: white;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-    gap: 1rem;
+    .upload-label {
+      cursor: pointer;
+      display: block;
 
-    span:first-child {
-      flex: 1;
-      font-weight: 500;
-    }
+      &:hover {
+        background: rgba(233, 30, 99, 0.1);
+      }
 
-    span:nth-child(2) {
-      color: #666;
-      min-width: 100px;
-      text-align: right;
-    }
-  }
-
-  .step-item {
-    padding: 0.75rem;
-    background: white;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-
-    span {
-      flex: 1;
-    }
-  }
-
-  .btn-remove {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background 0.3s;
-
-    &:hover {
-      background: #ee5a52;
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
-
-    button {
-      min-width: 150px;
-      transition: all 0.3s;
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none !important;
+      .upload-btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: var(--primary-color, #e91e63);
+        color: white;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s;
 
         &:hover {
-          transform: none !important;
-          box-shadow: none !important;
+          background: var(--primary-dark, #c2185b);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
         }
       }
     }
 
-    .btn-primary:disabled {
-      background: #ccc;
-      color: #666;
-    }
+    .image-preview {
+      position: relative;
 
-    .btn-secondary:disabled {
-      background: #999;
-      color: #ddd;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .recipe-form {
-    padding: 1rem;
-
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .add-ingredient {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-actions {
-      flex-direction: column;
+      img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        object-fit: contain;
+        margin-bottom: 1rem;
+      }
 
       button {
         width: 100%;
       }
     }
   }
+
+  // Ingredients Section
+  .add-ingredient-form {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+
+    .btn-add-ingredient {
+      width: 100%;
+      margin-top: 1rem;
+    }
+  }
+
+  .ingredients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    list-style: none;
+    margin: 0;
+
+    .ingredient-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid var(--primary-color, #e91e63);
+      gap: 1rem;
+      transition: all 0.2s;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .ingredient-content {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+
+        .ingredient-name {
+          font-weight: 500;
+          flex: 1;
+        }
+
+        .ingredient-quantity {
+          color: #666;
+          font-size: 0.9rem;
+          min-width: 80px;
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  // Steps Section
+  .add-step-form {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+
+    .btn-add-step {
+      width: 100%;
+      margin-top: 1rem;
+    }
+  }
+
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    list-style: none;
+    margin: 0;
+    counter-reset: step-counter;
+
+    .step-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: white;
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid var(--primary-color, #e91e63);
+      gap: 1rem;
+      transition: all 0.2s;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .step-content {
+        flex: 1;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+
+        .step-number {
+          font-weight: 700;
+          color: var(--primary-color, #e91e63);
+          min-width: 30px;
+          font-size: 1.1rem;
+        }
+
+        .step-text {
+          color: #333;
+          line-height: 1.5;
+        }
+      }
+
+      button {
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  // Validation Hints
+  .validation-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 6px;
+    background: rgba(244, 67, 54, 0.08);
+    border-left: 4px solid var(--error-color, #f44336);
+
+    &.error {
+      span {
+        color: var(--error-color, #f44336);
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      mat-icon {
+        color: var(--error-color, #f44336);
+      }
+    }
+  }
+
+  // Dialog Actions
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+    margin-top: 2rem;
+
+    button {
+      min-width: 120px;
+    }
+  }
 }
 
-.image-preview {
-  img {
-    height: 100px;
-    width: auto;
-    max-width: 100%;
-    border-radius: 8px;
-    object-fit: cover;
+@media (max-width: 768px) {
+  .recipe-form {
+    gap: 1.5rem;
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+
+      .form-group.flex-2 {
+        grid-column: 1;
+      }
+    }
+
+    .add-ingredient-form,
+    .add-step-form {
+      padding: 1rem;
+
+      .form-row {
+        gap: 0.75rem;
+      }
+    }
+
+    .ingredients-list,
+    .steps-list {
+      padding: 0.75rem;
+
+      .ingredient-item,
+      .step-item {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .ingredient-content {
+          flex-direction: column;
+          align-items: flex-start;
+          width: 100%;
+
+          .ingredient-quantity {
+            text-align: left;
+          }
+        }
+      }
+    }
+
+    .image-upload {
+      padding: 1.5rem;
+
+      .image-preview img {
+        max-height: 200px;
+      }
+    }
+
+    .dialog-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      button {
+        width: 100%;
+      }
+    }
   }
 }

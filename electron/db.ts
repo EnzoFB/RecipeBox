@@ -1,20 +1,14 @@
 import sqlite3 from 'sqlite3';
 import * as path from 'node:path';
 import { app } from 'electron';
+import { Logger } from './logger';
+import { RunAsyncOptions, TableSchema } from './types';
 
 // ============================================================================
-// Types & Constants
+// Constants
 // ============================================================================
 
-interface RunAsyncOptions {
-  sql: string;
-  params?: any[];
-}
-
-interface TableSchema {
-  name: string;
-  sql: string;
-}
+const logger = new Logger('Database');
 
 // ============================================================================
 // Database Schemas
@@ -488,11 +482,11 @@ class DatabaseManager {
   }
 
   private logInfo(message: string): void {
-    console.log(`[DB] ${message}`);
+    logger.info(message);
   }
 
   private logError(message: string, error: any): void {
-    console.error(`[DB] ${message}:`, error);
+    logger.error(message, error);
   }
 }
 

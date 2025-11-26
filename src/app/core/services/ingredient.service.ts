@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, from } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
 import { Ingredient, INGREDIENT_CATEGORIES } from '../models/ingredient.model';
 
 @Injectable({
@@ -16,7 +17,7 @@ export class IngredientService {
     if (globalThis.window && (globalThis.window as any).electronAPI) {
       (globalThis.window as any).electronAPI.ingredients.getAll().then((ingredients: Ingredient[]) => {
         this.ingredients$.next(ingredients);
-      }).catch((err: any) => {
+      }).catch((err: unknown) => {
         console.error('Error loading ingredients:', err);
       });
     }
@@ -34,31 +35,33 @@ export class IngredientService {
     return this.ingredients$.value.filter(i => i.category === category);
   }
 
-  addIngredient(ingredient: Omit<Ingredient, 'id'>): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.ingredients.add(ingredient).then(() => {
+  addIngredient(ingredient: Omit<Ingredient, 'id'>): Observable<void> {
+    return from(
+      (globalThis.window as any).electronAPI?.ingredients.add(ingredient) || Promise.resolve()
+    ).pipe(
+      map(() => undefined),
+      tap(() => {
         setTimeout(() => this.loadIngredients(), 100);
-      }).catch((err: any) => {
-        console.error('Error adding ingredient:', err);
-      });
-    }
+      })
+    );
   }
 
-  updateIngredient(id: number, ingredient: Omit<Ingredient, 'id'>): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.ingredients.update(id, ingredient).then(() => {
+  updateIngredient(id: number, ingredient: Omit<Ingredient, 'id'>): Observable<void> {
+    return from(
+      (globalThis.window as any).electronAPI?.ingredients.update(id, ingredient) || Promise.resolve()
+    ).pipe(
+      map(() => undefined),
+      tap(() => {
         setTimeout(() => this.loadIngredients(), 100);
-      }).catch((err: any) => {
-        console.error('Error updating ingredient:', err);
-      });
-    }
+      })
+    );
   }
 
   deleteIngredient(id: number): void {
     if (globalThis.window && (globalThis.window as any).electronAPI) {
       (globalThis.window as any).electronAPI.ingredients.delete(id).then(() => {
         setTimeout(() => this.loadIngredients(), 100);
-      }).catch((err: any) => {
+      }).catch((err: unknown) => {
         console.error('Error deleting ingredient:', err);
       });
     }

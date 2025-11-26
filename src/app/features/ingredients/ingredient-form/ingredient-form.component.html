@@ -1,10 +1,16 @@
 <h2 mat-dialog-title>
-  {{ isEditMode ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}
+  <div class="dialog-title">
+    <mat-icon>{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+    <span>{{ isEditMode ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}</span>
+  </div>
 </h2>
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()" mat-dialog-content>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" mat-dialog-content class="ingredient-form-wrapper">
   <div class="form-section">
-    <h3>Informations générales</h3>
+    <h3>
+      <mat-icon class="section-icon">info</mat-icon>
+      Informations générales
+    </h3>
 
     <div class="form-group">
       <mat-form-field appearance="outline" class="full-width">
@@ -42,7 +48,10 @@
   </div>
 
   <div class="form-section">
-    <h3>Image</h3>
+    <h3>
+      <mat-icon class="section-icon">image</mat-icon>
+      Image
+    </h3>
     <div class="image-upload">
       @if (imagePreview) {
         <div class="image-preview">
@@ -54,6 +63,7 @@
             (click)="removeImage()"
             class="remove-btn"
           >
+            <mat-icon>delete</mat-icon>
             Supprimer l'image
           </button>
         </div>
@@ -65,14 +75,20 @@
             (change)="onImageSelected($event)"
             hidden
           />
-          <span class="upload-btn">📷 Ajouter une image</span>
+          <span class="upload-btn">
+            <mat-icon>photo_camera</mat-icon>
+            Ajouter une image
+          </span>
         </label>
       }
     </div>
   </div>
 
   <div class="form-section">
-    <h3>Informations nutritionnelles (pour 100g)</h3>
+    <h3>
+      <mat-icon class="section-icon">nutrition</mat-icon>
+      Informations nutritionnelles (pour 100g)
+    </h3>
 
     <div class="form-row">
       <div class="form-group">
@@ -116,6 +132,7 @@
     (click)="onSubmit()"
     [disabled]="!form.valid"
   >
+    <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
     {{ isEditMode ? 'Modifier' : 'Créer' }} l'ingrédient
   </button>
 </div>

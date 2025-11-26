@@ -19,37 +19,39 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('ingredients');"
-        [class.active]="currentPage() === 'ingredients'"
-      >
-        <mat-icon matListItemIcon>restaurant</mat-icon>
-        <span matListItemTitle>Ingrédients</span>
-      </button>
-
-      <button
-        mat-list-item
         (click)="navigateTo('stock');"
         [class.active]="currentPage() === 'stock'"
       >
         <mat-icon matListItemIcon>inventory_2</mat-icon>
-        <span matListItemTitle>Stock</span>
+        <span matListItemTitle>Mon Stock</span>
+      </button>
+
+      <mat-divider />
+
+      <button
+        mat-list-item
+        (click)="navigateTo('recipes-management');"
+        [class.active]="currentPage() === 'recipes-management'"
+      >
+        <mat-icon matListItemIcon>kitchen</mat-icon>
+        <span matListItemTitle>Gestion des Recettes</span>
       </button>
 
       <button
         mat-list-item
-        (click)="navigateTo('search');"
-        [class.active]="currentPage() === 'search'"
+        (click)="navigateTo('ingredients');"
+        [class.active]="currentPage() === 'ingredients'"
       >
-        <mat-icon matListItemIcon>search</mat-icon>
-        <span matListItemTitle>Rechercher</span>
+        <mat-icon matListItemIcon>restaurant</mat-icon>
+        <span matListItemTitle>Gestion des Ingrédients</span>
       </button>
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content class="main-content">
-    <app-recipes *ngIf="currentPage() === 'recipes'"></app-recipes>
-    <app-ingredients *ngIf="currentPage() === 'ingredients'"></app-ingredients>
-    <app-stock *ngIf="currentPage() === 'stock'"></app-stock>
-    <app-recipe-search *ngIf="currentPage() === 'search'"></app-recipe-search>
+    @if (currentPage() === 'recipes') { <app-recipes /> }
+    @if (currentPage() === 'recipes-management') { <app-recipes-management /> }
+    @if (currentPage() === 'ingredients') { <app-ingredients /> }
+    @if (currentPage() === 'stock') { <app-stock /> }
   </mat-sidenav-content>
 </mat-sidenav-container>

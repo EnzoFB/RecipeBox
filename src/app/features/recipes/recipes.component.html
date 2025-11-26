@@ -1,14 +1,13 @@
 <div class="recipes-container">
   <div class="header">
     <h1>📖 Mes Recettes</h1>
-    <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter une recette</button>
   </div>
 
   <div class="search-section">
     <input
       type="text"
       class="search-input"
-      placeholder="Rechercher une recette..."
+      placeholder="Rechercher une recette réalisable..."
       [(ngModel)]="searchQuery"
       (input)="onSearch()"
     />
@@ -17,12 +16,13 @@
   <div class="recipes-grid">
     @if (filteredRecipes.length === 0) {
       <div class="empty-state">
-        <p>Aucune recette trouvée. Commencez par en ajouter une !</p>
+        <p>✅ Aucune recette réalisable avec votre stock actuel.</p>
+        <small>Ajoutez des ingrédients au stock pour commencer !</small>
       </div>
     }
 
     @for (recipe of filteredRecipes; track recipe.id) {
-      <mat-card class="recipe-card">
+      <mat-card class="recipe-card feasible-card">
         <div class="recipe-image">
           @if (recipe.image) {
             <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-photo" />
@@ -35,6 +35,7 @@
         <mat-card-header>
           <h3>{{ recipe.name }}</h3>
           <span class="category-badge">{{ recipe.category }}</span>
+          <span class="feasible-badge">✓ Réalisable</span>
         </mat-card-header>
         <mat-card-content>
           <p class="recipe-description">{{ recipe.description }}</p>

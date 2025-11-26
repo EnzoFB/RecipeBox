@@ -8,13 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { Recipe } from '../../core/models';
-import { RecipeService } from '../../core/services';
-import { IngredientStockService } from '../../core/services/ingredient-stock.service';
-import { RecipeFormComponent } from './recipe-form/recipe-form.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Recipe } from '../../../core/models';
+import { RecipeService } from '../../../core/services';
+import { RecipeFormComponent } from '../recipe-form/recipe-form.component';
 
 @Component({
-  selector: 'app-recipes',
+  selector: 'app-recipes-management',
   standalone: true,
   imports: [
     CommonModule,
@@ -25,42 +25,29 @@ import { RecipeFormComponent } from './recipe-form/recipe-form.component';
     MatFormFieldModule,
     MatDialogModule,
     MatCardModule,
-    MatChipsModule
+    MatChipsModule,
+    MatTooltipModule
   ],
-  templateUrl: './recipes.component.html',
-  styleUrl: './recipes.component.scss'
+  templateUrl: './recipes-management.component.html',
+  styleUrl: './recipes-management.component.scss'
 })
-export class RecipesComponent implements OnInit {
+export class RecipesManagementComponent implements OnInit {
   recipes = signal<Recipe[]>([]);
   searchQuery = signal('');
-  recipesFeasible = signal<Recipe[]>([]);
 
   constructor(
     private readonly recipeService: RecipeService,
-    private readonly stockService: IngredientStockService,
     private readonly dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.recipeService.getRecipes().subscribe(recipes => {
-      this.recipes.set(recipes);
-      this.updateRecipeAvailability();
-    });
-
-    // Subscribe to stock changes
-    this.stockService.getStock().subscribe(() => {
-      this.updateRecipeAvailability();
-    });
+    this.loadRecipes();
   }
 
-  private updateRecipeAvailability(): void {
-    const allRecipes = this.recipes();
-    
-    // Recettes réalisables avec le stock actuel
-    const feasible = allRecipes.filter(recipe =>
-      this.stockService.canMakeRecipe(recipe.ingredients)
-    );
-    this.recipesFeasible.set(feasible);
+  private loadRecipes(): void {
+    this.recipeService.getRecipes().subscribe(recipes => {
+      this.recipes.set(recipes);
+    });
   }
 
   openAddForm(): void {
@@ -71,6 +58,7 @@ export class RecipesComponent implements OnInit {
     }).afterClosed().subscribe((result: any) => {
       if (result) {
         this.recipeService.addRecipe(result);
+        this.loadRecipes();
       }
     });
   }
@@ -83,6 +71,7 @@ export class RecipesComponent implements OnInit {
     }).afterClosed().subscribe((result: any) => {
       if (result) {
         this.recipeService.updateRecipe(recipe.id!, result);
+        this.loadRecipes();
       }
     });
   }
@@ -90,6 +79,7 @@ export class RecipesComponent implements OnInit {
   onDeleteRecipe(id: number): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')) {
       this.recipeService.deleteRecipe(id);
+      this.loadRecipes();
     }
   }
 
@@ -99,17 +89,15 @@ export class RecipesComponent implements OnInit {
       const filtered = this.recipeService.searchRecipes(query);
       this.recipes.set(filtered);
     } else {
-      this.recipeService.getRecipes().subscribe(recipes => {
-        this.recipes.set(recipes);
-      });
+      this.loadRecipes();
     }
   }
 
   get filteredRecipes(): Recipe[] {
     const query = this.searchQuery().toLowerCase();
-    if (!query) return this.recipesFeasible();
+    if (!query) return this.recipes();
 
-    return this.recipesFeasible().filter(recipe =>
+    return this.recipes().filter(recipe =>
       recipe.name?.toLowerCase().includes(query) ||
       recipe.category?.toLowerCase().includes(query)
     );

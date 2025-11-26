@@ -1,0 +1,73 @@
+<div class="management-container">
+  <div class="header">
+    <h1>🍽️ Gestion des Recettes</h1>
+    <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter une recette</button>
+  </div>
+
+  <div class="search-section">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Rechercher une recette..."
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+    />
+    <span class="recipe-count">{{ filteredRecipes.length }} recette(s)</span>
+  </div>
+
+  <div class="recipes-table-container">
+    @if (filteredRecipes.length === 0) {
+      <div class="empty-state">
+        <p>📋 Aucune recette trouvée.</p>
+        <small>Commencez par en ajouter une !</small>
+      </div>
+    } @else {
+      <table class="recipes-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>Temps</th>
+            <th>Portions</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (recipe of filteredRecipes; track recipe.id) {
+            <tr class="recipe-row">
+              <td>{{ recipe.name }}</td>
+              <td>
+                <span class="category-badge">{{ recipe.category }}</span>
+              </td>
+              <td>{{ recipe.prepTime + recipe.cookTime }}min</td>
+              <td>{{ recipe.servings }} pers.</td>
+              <td class="actions-cell">
+                <button
+                  mat-icon-button
+                  matTooltip="Modifier"
+                  (click)="openEditForm(recipe)"
+                  class="edit-btn"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  matTooltip="Supprimer"
+                  (click)="onDeleteRecipe(recipe.id!)"
+                  class="delete-btn"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Info -->
+  <div class="view-toggle">
+    <p class="toggle-info">💡 Utilisez cette page pour gérer TOUTES vos recettes</p>
+  </div>
+</div>

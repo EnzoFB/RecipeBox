@@ -8,8 +8,8 @@
   @for (recipe of filteredRecipes; track $index) {
     <div class="recipe-card">
       <div class="recipe-header">
-        <h3>{{ recipe.name }}</h3>
         <span class="category-badge">{{ recipe.category }}</span>
+        <h3>{{ recipe.name }}</h3>
       </div>
       <p class="recipe-description">{{ recipe.description }}</p>
       <div class="recipe-info">

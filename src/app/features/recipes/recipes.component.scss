@@ -58,6 +58,10 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
 
+  &.feasible-card {
+    border-left: 4px solid #27ae60;
+  }
+
   .recipe-image {
     height: 200px;
     margin: -1.5rem -1.5rem 1rem -1.5rem;
@@ -86,17 +90,16 @@
     }
   }
 
-  .recipe-header {
+  mat-card-header {
     display: flex;
-    justify-content: space-between;
-    align-items: start;
+    flex-direction: column;
+    gap: 0.5rem;
     margin-bottom: 1rem;
 
     h3 {
       margin: 0;
       font-size: 1.25rem;
       color: #333;
-      flex: 1;
     }
 
     .category-badge {
@@ -107,34 +110,54 @@
       font-size: 0.85rem;
       font-weight: 500;
       white-space: nowrap;
-      margin-left: 0.5rem;
+      width: fit-content;
+    }
+
+    .feasible-badge {
+      background: #d4edda;
+      color: #155724;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      width: fit-content;
     }
   }
 
-  .recipe-description {
-    color: #666;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    line-height: 1.4;
-    height: 42px;
-  }
-
-  .recipe-info {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-
-    .info-item {
+  mat-card-content {
+    .recipe-description {
       color: #666;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      height: 42px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .recipe-info {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 0;
+      font-size: 0.9rem;
+
+      .info-item {
+        color: #666;
+      }
     }
   }
 
-  .recipe-actions {
+  mat-card-actions {
     display: flex;
     gap: 0.5rem;
+    padding: 1rem 0 0 0;
+    margin: 1rem 0 0 0;
+    border-top: 1px solid #f0f0f0;
 
-    .btn {
+    button {
       flex: 1;
       padding: 0.5rem 1rem;
       font-size: 0.9rem;
@@ -150,29 +173,12 @@
 
   p {
     font-size: 1.1rem;
-    margin: 0;
+    margin: 0.5rem 0;
   }
-}
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-
-  .modal-content {
-    background: white;
-    border-radius: 12px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
+  small {
+    font-size: 0.9rem;
+    color: #bbb;
   }
 }
 
@@ -196,3 +202,4 @@
     grid-template-columns: 1fr;
   }
 }
+

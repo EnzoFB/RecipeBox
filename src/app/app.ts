@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { RecipeSearchComponent } from './features/recipes/recipe-search/recipe-search.component';
 import { RecipesComponent } from './features/recipes/recipes.component';
+import { RecipesManagementComponent } from './features/recipes/recipes-management/recipes-management.component';
 import { IngredientsComponent } from './features/ingredients/ingredients.component';
 import { StockComponent } from './features/ingredients/stock/stock.component';
 
@@ -20,6 +21,7 @@ import { StockComponent } from './features/ingredients/stock/stock.component';
     MatIconModule,
     MatListModule,
     RecipesComponent,
+    RecipesManagementComponent,
     IngredientsComponent,
     StockComponent,
     RecipeSearchComponent
@@ -28,9 +30,10 @@ import { StockComponent } from './features/ingredients/stock/stock.component';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly currentPage = signal<'recipes' | 'ingredients' | 'stock' | 'search'>('recipes');
+  protected readonly currentPage = signal<'recipes' | 'recipes-management' | 'ingredients' | 'stock' | 'search'>('recipes');
 
-  navigateTo(page: 'recipes' | 'ingredients' | 'stock' | 'search'): void {
+  navigateTo(page: 'recipes' | 'recipes-management' | 'ingredients' | 'stock' | 'search'): void {
     this.currentPage.set(page);
   }
 }
+

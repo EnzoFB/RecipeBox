@@ -69,12 +69,7 @@
         </div>
       } @else {
         <label class="upload-label">
-          <input
-            type="file"
-            accept="image/*"
-            (change)="onImageSelected($event)"
-            hidden
-          />
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
           <span class="upload-btn">
             <mat-icon>photo_camera</mat-icon>
             Ajouter une image
@@ -126,12 +121,7 @@
 
 <div mat-dialog-actions class="dialog-actions">
   <button mat-button (click)="onCancel()">Annuler</button>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="onSubmit()"
-    [disabled]="!form.valid"
-  >
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!form.valid">
     <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
     {{ isEditMode ? 'Modifier' : 'Créer' }} l'ingrédient
   </button>

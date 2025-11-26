@@ -16,11 +16,11 @@ export const appRoutes: Routes = [
   },
   {
     path: 'recipes/create',
-    loadComponent: () => import('./features/recipes/recipe-form/recipe-form.component').then(m => m.RecipeFormComponent)
+    loadComponent: () => import('./features/recipes/recipe-form/recipe-form-page.component').then(m => m.RecipeFormPageComponent)
   },
   {
     path: 'recipes/:id/edit',
-    loadComponent: () => import('./features/recipes/recipe-form/recipe-form.component').then(m => m.RecipeFormComponent)
+    loadComponent: () => import('./features/recipes/recipe-form/recipe-form-page.component').then(m => m.RecipeFormPageComponent)
   },
   {
     path: 'stock',

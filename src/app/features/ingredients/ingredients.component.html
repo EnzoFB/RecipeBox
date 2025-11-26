@@ -1,7 +1,9 @@
 <div class="ingredients-container">
   <div class="header">
     <h1>🥬 Gestion des Ingrédients</h1>
-    <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter un ingrédient</button>
+    <button mat-raised-button color="primary" (click)="openAddForm()">
+      + Ajouter un ingrédient
+    </button>
   </div>
 
   <div class="filters-section">
@@ -18,7 +20,7 @@
     <div class="category-filter">
       <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
         <option value="">-- Toutes les catégories --</option>
-        @for(cat of categories; track $index) {
+        @for (cat of categories; track $index) {
           <option [value]="cat">{{ cat }}</option>
         }
       </select>
@@ -26,13 +28,13 @@
   </div>
 
   <div class="ingredients-grid">
-    @if(filteredIngredients.length === 0) {
+    @if (filteredIngredients.length === 0) {
       <div class="empty-state">
         <p>Aucun ingrédient trouvé.</p>
       </div>
     }
 
-    @for(ingredient of filteredIngredients; track ingredient.id) {
+    @for (ingredient of filteredIngredients; track ingredient.id) {
       <mat-card class="ingredient-card">
         <div class="ingredient-image">
           @if (ingredient.image) {
@@ -72,9 +74,7 @@
           </div>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button (click)="openEditForm(ingredient)">
-            Modifier
-          </button>
+          <button mat-button (click)="openEditForm(ingredient)">Modifier</button>
           <button mat-button color="warn" (click)="onDeleteIngredient(ingredient.id!)">
             Supprimer
           </button>

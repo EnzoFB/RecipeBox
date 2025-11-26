@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Recipe, Ingredient, RecipeFormData } from '../../../core/models';
@@ -28,7 +29,8 @@ import { IngredientService, RecipeService } from '../../../core/services';
     MatIconModule,
     MatTooltipModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    DragDropModule
   ],
   templateUrl: './recipe-form-page.component.html',
   styleUrl: './recipe-form-page.component.scss',
@@ -98,11 +100,16 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
   }
 
   private loadRecipe(id: number): void {
-    const recipe = this.recipeService.getRecipeById(id);
-    if (recipe) {
-      this.populateForm(recipe);
-    }
-    this.isLoading.set(false);
+    // Subscribe to recipes to ensure data is loaded
+    this.recipeService.getRecipes()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(recipes => {
+        const recipe = recipes.find(r => r.id === id);
+        if (recipe) {
+          this.populateForm(recipe);
+        }
+        this.isLoading.set(false);
+      });
   }
 
   private populateForm(recipe: Recipe): void {
@@ -180,6 +187,12 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
     this.steps.update(steps => steps.filter((_, i) => i !== index));
   }
 
+  dropStep(event: CdkDragDrop<string[]>): void {
+    const stepsArray = [...this.steps()];
+    moveItemInArray(stepsArray, event.previousIndex, event.currentIndex);
+    this.steps.set(stepsArray);
+  }
+
   onSubmit(): void {
     if (!this.form.valid || this.steps().length === 0 || this.selectedIngredients().length === 0) {
       alert('Veuillez remplir tous les champs requis');
@@ -204,11 +217,11 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
       this.recipeService.addRecipe(formData);
     }
 
-    this.router.navigate(['/recipes/manage']);
+    this.router.navigate(['/recipes']);
   }
 
   onCancel(): void {
-    this.router.navigate(['/recipes/manage']);
+    this.router.navigate(['/recipes']);
   }
 
   getIngredientName(ingredientId: number): string {

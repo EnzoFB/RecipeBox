@@ -31,7 +31,12 @@
 
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" placeholder="Décrivez votre recette..." rows="3"></textarea>
+                <textarea
+                  matInput
+                  formControlName="description"
+                  placeholder="Décrivez votre recette..."
+                  rows="3"
+                ></textarea>
                 @if (form.get('description')?.hasError('required')) {
                   <mat-error>La description est requise</mat-error>
                 }
@@ -84,13 +89,24 @@
               @if (imagePreview()) {
                 <div class="image-preview">
                   <img [src]="imagePreview()" alt="Aperçu" />
-                  <button type="button" mat-icon-button (click)="removeImage()" class="remove-btn" matTooltip="Supprimer">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="removeImage()"
+                    class="remove-btn"
+                    matTooltip="Supprimer"
+                  >
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
               } @else {
                 <label class="upload-zone">
-                  <input type="file" accept="image/*" (change)="onImageSelected($event)" style="display: none;" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    (change)="onImageSelected($event)"
+                    style="display: none"
+                  />
                   <div class="upload-icon">
                     <mat-icon>add_a_photo</mat-icon>
                     <p>Cliquez pour ajouter une image</p>
@@ -130,7 +146,13 @@
                   <mat-option value="unité">unité</mat-option>
                 </mat-select>
               </mat-form-field>
-              <button type="button" mat-raised-button color="accent" (click)="addIngredient()" [disabled]="!isIngredientFieldsValid()">
+              <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="addIngredient()"
+                [disabled]="!isIngredientFieldsValid()"
+              >
                 <mat-icon>add</mat-icon>
                 Ajouter
               </button>
@@ -140,8 +162,16 @@
               <div class="ingredients-list">
                 @for (ingredient of selectedIngredients(); track ingredient.ingredientId) {
                   <div class="ingredient-chip">
-                    <span>{{ getIngredientName(ingredient.ingredientId) }} - {{ ingredient.quantity }}{{ ingredient.unit }}</span>
-                    <button type="button" mat-icon-button (click)="removeIngredient(ingredient.ingredientId)" matTooltip="Supprimer">
+                    <span
+                      >{{ getIngredientName(ingredient.ingredientId) }} - {{ ingredient.quantity
+                      }}{{ ingredient.unit }}</span
+                    >
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="removeIngredient(ingredient.ingredientId)"
+                      matTooltip="Supprimer"
+                    >
                       <mat-icon>close</mat-icon>
                     </button>
                   </div>
@@ -158,21 +188,38 @@
             <div class="steps-input">
               <mat-form-field appearance="outline" class="flex-1">
                 <mat-label>Étape</mat-label>
-                <textarea matInput [(ngModel)]="newStep" [ngModelOptions]="{standalone: true}" placeholder="Décrivez l'étape..."></textarea>
+                <textarea
+                  matInput
+                  [(ngModel)]="newStep"
+                  [ngModelOptions]="{ standalone: true }"
+                  placeholder="Décrivez l'étape..."
+                ></textarea>
               </mat-form-field>
-              <button type="button" mat-raised-button color="accent" (click)="addStep()" [disabled]="!canAddStep()">
+              <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="addStep()"
+                [disabled]="!canAddStep()"
+              >
                 <mat-icon>add</mat-icon>
                 Ajouter
               </button>
             </div>
 
             @if (steps().length > 0) {
-              <div class="steps-list">
+              <div class="steps-list" cdkDropList (cdkDropListDropped)="dropStep($event)">
                 @for (step of steps(); track $index; let i = $index) {
-                  <div class="step-item">
+                  <div class="step-item" cdkDrag>
+                    <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
                     <span class="step-number">{{ i + 1 }}.</span>
                     <span class="step-text">{{ step }}</span>
-                    <button type="button" mat-icon-button (click)="removeStep(i)" matTooltip="Supprimer">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="removeStep(i)"
+                      matTooltip="Supprimer"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>

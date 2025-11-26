@@ -58,24 +58,14 @@
             @if (imagePreview) {
               <div class="image-preview">
                 <img [src]="imagePreview" alt="Prévisualisation" />
-                <button
-                  type="button"
-                  mat-stroked-button
-                  color="warn"
-                  (click)="removeImage()"
-                >
+                <button type="button" mat-stroked-button color="warn" (click)="removeImage()">
                   <mat-icon>delete</mat-icon>
                   Supprimer l'image
                 </button>
               </div>
             } @else {
               <label class="upload-label">
-                <input
-                  type="file"
-                  accept="image/*"
-                  (change)="onImageSelected($event)"
-                  hidden
-                />
+                <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
                 <span class="upload-btn">
                   <mat-icon>photo_camera</mat-icon>
                   Ajouter une image
@@ -119,15 +109,8 @@
 
         <!-- Actions -->
         <div class="form-actions">
-          <button mat-stroked-button type="button" (click)="onCancel()">
-            Annuler
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="!form.valid"
-          >
+          <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
             <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
             {{ isEditMode ? 'Modifier' : 'Créer' }} l'ingrédient
           </button>

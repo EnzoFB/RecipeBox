@@ -87,23 +87,13 @@
       @if (imagePreview()) {
         <div class="image-preview">
           <img [src]="imagePreview()" alt="Prévisualisation" />
-          <button
-            type="button"
-            mat-stroked-button
-            color="warn"
-            (click)="removeImage()"
-          >
+          <button type="button" mat-stroked-button color="warn" (click)="removeImage()">
             Supprimer l'image
           </button>
         </div>
       } @else {
         <label class="upload-label">
-          <input
-            type="file"
-            accept="image/*"
-            (change)="onImageSelected($event)"
-            hidden
-          />
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
           <span class="upload-btn">📷 Ajouter une image</span>
         </label>
       }
@@ -174,7 +164,9 @@
           <div class="ingredient-item">
             <div class="ingredient-content">
               <span class="ingredient-name">{{ getIngredientName(ingredient.ingredientId) }}</span>
-              <span class="ingredient-quantity">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+              <span class="ingredient-quantity"
+                >{{ ingredient.quantity }} {{ ingredient.unit }}</span
+              >
             </div>
             <button
               type="button"
@@ -274,4 +266,3 @@
     {{ isEditMode ? 'Modifier' : 'Créer' }} la recette
   </button>
 </div>
-

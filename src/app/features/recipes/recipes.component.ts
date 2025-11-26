@@ -1,17 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { Recipe } from '../../core/models';
 import { RecipeService } from '../../core/services';
 import { IngredientStockService } from '../../core/services/ingredient-stock.service';
-import { RecipeFormComponent } from './recipe-form/recipe-form.component';
 
 @Component({
   selector: 'app-recipes',
@@ -23,7 +22,6 @@ import { RecipeFormComponent } from './recipe-form/recipe-form.component';
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
-    MatDialogModule,
     MatCardModule,
     MatChipsModule
   ],
@@ -38,7 +36,7 @@ export class RecipesComponent implements OnInit {
   constructor(
     private readonly recipeService: RecipeService,
     private readonly stockService: IngredientStockService,
-    private readonly dialog: MatDialog
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -64,27 +62,11 @@ export class RecipesComponent implements OnInit {
   }
 
   openAddForm(): void {
-    this.dialog.open(RecipeFormComponent, {
-      width: '800px',
-      maxHeight: '90vh',
-      data: { recipe: null }
-    }).afterClosed().subscribe((result: any) => {
-      if (result) {
-        this.recipeService.addRecipe(result);
-      }
-    });
+    this.router.navigate(['/recipes/create']);
   }
 
   openEditForm(recipe: Recipe): void {
-    this.dialog.open(RecipeFormComponent, {
-      width: '800px',
-      maxHeight: '90vh',
-      data: { recipe }
-    }).afterClosed().subscribe((result: any) => {
-      if (result) {
-        this.recipeService.updateRecipe(recipe.id!, result);
-      }
-    });
+    this.router.navigate(['/recipes', recipe.id, 'edit']);
   }
 
   onDeleteRecipe(id: number): void {

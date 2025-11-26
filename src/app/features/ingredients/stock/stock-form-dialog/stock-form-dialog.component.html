@@ -25,11 +25,11 @@
     <div class="form-group">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Unité (définie par l'ingrédient)</mat-label>
-        <input 
-          matInput 
-          type="text" 
-          [value]="selectedUnit ? (selectedUnit.name + ' (' + selectedUnit.symbol + ')') : '-'" 
-          readonly 
+        <input
+          matInput
+          type="text"
+          [value]="selectedUnit ? selectedUnit.name + ' (' + selectedUnit.symbol + ')' : '-'"
+          readonly
           disabled
         />
       </mat-form-field>

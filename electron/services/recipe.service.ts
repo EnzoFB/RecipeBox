@@ -14,15 +14,36 @@ export class RecipeService {
       logger.debug('Fetching all recipes');
       
       const recipes = await allAsync<any>(`
-        SELECT r.*, 
-               GROUP_CONCAT(ri.ingredientId || ':' || ri.quantity || ':' || ri.unit) as ingredientsList
+        SELECT r.* 
         FROM recipes r
-        LEFT JOIN recipe_ingredients ri ON r.id = ri.recipeId
-        GROUP BY r.id
         ORDER BY r.createdAt DESC
       `);
       
-      return recipes.map(recipe => this.parseRecipeWithIngredients(recipe));
+      // Load ingredients and steps for each recipe
+      const recipesWithDetails = await Promise.all(
+        recipes.map(async (recipe) => {
+          const ingredients = await allAsync<RecipeIngredient>(`
+            SELECT ingredientId, quantity, unit
+            FROM recipe_ingredients
+            WHERE recipeId = ?
+          `, [recipe.id]);
+
+          const steps = await allAsync<{ stepOrder: number; description: string }>(`
+            SELECT stepOrder, description 
+            FROM recipe_steps
+            WHERE recipeId = ?
+            ORDER BY stepOrder ASC
+          `, [recipe.id]);
+
+          return {
+            ...recipe,
+            ingredients,
+            steps: steps.map(s => s.description)
+          };
+        })
+      );
+      
+      return recipesWithDetails;
     } catch (error) {
       logger.error('Failed to fetch all recipes', error);
       throw error;
@@ -202,5 +223,39 @@ export class RecipeService {
           })
         : []
     };
+  }
+
+  private parseRecipeWithIngredientsAndSteps(recipe: any): Recipe {
+    const parsed: Recipe = {
+      ...recipe,
+      ingredients: recipe.ingredientsList
+        ? recipe.ingredientsList.split(',').map((ing: string) => {
+            const [ingredientId, quantity, unit] = ing.split(':');
+            return {
+              ingredientId: Number.parseInt(ingredientId),
+              quantity: Number.parseFloat(quantity),
+              unit
+            };
+          })
+        : [],
+      steps: []
+    };
+
+    // Parse steps
+    if (recipe.stepsList) {
+      const stepsArray = recipe.stepsList.split('|')
+        .map((step: string) => {
+          const parts = step.split(':');
+          return {
+            order: Number.parseInt(parts[0]),
+            description: parts.slice(1).join(':') // Rejoin in case description contains ':'
+          };
+        })
+        .sort((a: { order: number; description: string }, b: { order: number; description: string }) => a.order - b.order);
+      
+      parsed.steps = stepsArray.map((s: { order: number; description: string }) => s.description);
+    }
+
+    return parsed;
   }
 }

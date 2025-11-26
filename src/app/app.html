@@ -8,20 +8,12 @@
 <mat-sidenav-container class="app-container" autosize>
   <mat-sidenav #sidenav class="sidenav" mode="side" opened>
     <mat-nav-list>
-      <button
-        mat-list-item
-        (click)="navigateTo('recipes')"
-        [class.active]="isActive('recipes')"
-      >
+      <button mat-list-item (click)="navigateTo('recipes')" [class.active]="isActive('recipes')">
         <mat-icon matListItemIcon>menu_book</mat-icon>
         <span matListItemTitle>Mes Recettes</span>
       </button>
 
-      <button
-        mat-list-item
-        (click)="navigateTo('stock')"
-        [class.active]="isActive('stock')"
-      >
+      <button mat-list-item (click)="navigateTo('stock')" [class.active]="isActive('stock')">
         <mat-icon matListItemIcon>inventory_2</mat-icon>
         <span matListItemTitle>Mon Stock</span>
       </button>

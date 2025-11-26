@@ -18,15 +18,19 @@
     <div class="category-filter">
       <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
         <option value="">-- Toutes les catégories --</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        @for(cat of categories; track $index) {
+          <option [value]="cat">{{ cat }}</option>
+        }
       </select>
     </div>
   </div>
 
   <div class="ingredients-grid">
-    <div *ngIf="filteredIngredients.length === 0" class="empty-state">
-      <p>Aucun ingrédient trouvé.</p>
-    </div>
+    @if(filteredIngredients.length === 0) {
+      <div class="empty-state">
+        <p>Aucun ingrédient trouvé.</p>
+      </div>
+    }
 
     @for(ingredient of filteredIngredients; track ingredient.id) {
       <mat-card class="ingredient-card">

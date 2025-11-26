@@ -72,30 +72,34 @@
             <span class="stat"> <strong>Étapes :</strong> {{ recipe.steps?.length }} </span>
           </div>
 
-          <div *ngIf="selectedRecipe() === recipe" class="recipe-detail">
-            <div class="detail-section">
-              <h4>Ingrédients</h4>
-              <ul>
-                <li *ngFor="let ingredient of recipe.ingredients">
-                  {{ getIngredientName(ingredient.ingredientId) }} - {{ ingredient.quantity }}
-                  {{ ingredient.unit }}
-                </li>
-              </ul>
+          @if(selectedRecipe() === recipe) {
+            <div class="recipe-detail">
+              <div class="detail-section">
+                <h4>Ingrédients</h4>
+                <ul>
+                  @for(ingredient of recipe.ingredients; track ingredient.ingredientId) {
+                    <li>
+                      {{ getIngredientName(ingredient.ingredientId) }} - {{ ingredient.quantity }}
+                      {{ ingredient.unit }}
+                    </li>
+                  }
+                </ul>
+              </div>
+  
+              <div class="detail-section">
+                <h4>Préparation</h4>
+                <ol>
+                  @for (step of recipe.steps; track step) {
+                    <li>
+                      {{ step }}
+                    </li>
+                  }
+                </ol>
+              </div>
+  
+              <button class="btn btn-secondary" (click)="closeDetail()">Fermer</button>
             </div>
-
-            <div class="detail-section">
-              <h4>Préparation</h4>
-              <ol>
-                @for (step of recipe.steps; track step) {
-                  <li>
-                    {{ step }}
-                  </li>
-                }
-              </ol>
-            </div>
-
-            <button class="btn btn-secondary" (click)="closeDetail()">Fermer</button>
-          </div>
+          }
         </div>
       }
     </div>

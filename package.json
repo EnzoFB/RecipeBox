@@ -10,6 +10,8 @@
     "build:electron": "tsc -p tsconfig.electron.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "lint:html": "htmlhint src/**/*.html",
+    "lint:html:fix": "prettier --write src/**/*.html",
     "package": "npm run build && npm run build:electron && electron-forge package",
     "make": "npm run build && npm run build:electron && electron-forge make"
   },
@@ -55,6 +57,7 @@
     "@electron/fuses": "^1.8.0",
     "electron": "^39.2.3",
     "electron-reloader": "^1.2.3",
+    "htmlhint": "^1.8.0",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

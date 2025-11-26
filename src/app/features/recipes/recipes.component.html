@@ -14,7 +14,7 @@
     />
   </div>
 
-  @if(showForm()) {
+  @if (showForm()) {
     <div class="modal-overlay" (click)="closeForm()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <app-recipe-form
@@ -27,16 +27,16 @@
   }
 
   <div class="recipes-grid">
-    @if(filteredRecipes.length === 0) {
+    @if (filteredRecipes.length === 0) {
       <div class="empty-state">
         <p>Aucune recette trouvée. Commencez par en ajouter une !</p>
       </div>
     }
 
-    @for(recipe of filteredRecipes; track recipe.id) {
+    @for (recipe of filteredRecipes; track recipe.id) {
       <div class="recipe-card">
         <div class="recipe-image">
-          @if(recipe.image) {
+          @if (recipe.image) {
             <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-photo" />
           } @else {
             <div class="recipe-placeholder">
@@ -59,6 +59,5 @@
         </div>
       </div>
     }
-
   </div>
 </div>

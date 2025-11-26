@@ -1,11 +1,11 @@
 <div class="recipe-list">
-  @if(filteredRecipes.length === 0) {
+  @if (filteredRecipes.length === 0) {
     <div class="empty-state">
       <p>Aucune recette trouvée.</p>
     </div>
   }
 
-  @for(recipe of filteredRecipes; track $index) {
+  @for (recipe of filteredRecipes; track $index) {
     <div class="recipe-card">
       <div class="recipe-header">
         <h3>{{ recipe.name }}</h3>

@@ -4,7 +4,7 @@
     <button class="btn btn-primary" (click)="openAddForm()">+ Ajouter au stock</button>
   </div>
 
-  @if(showForm()) {
+  @if (showForm()) {
     <div class="modal-overlay" (click)="closeForm()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="form-header">
@@ -25,7 +25,13 @@
           <div class="form-row">
             <div class="form-group">
               <label for="quantity">Quantité *</label>
-              <input id="quantity" type="number" formControlName="quantity" class="form-control" step="0.1" />
+              <input
+                id="quantity"
+                type="number"
+                formControlName="quantity"
+                class="form-control"
+                step="0.1"
+              />
             </div>
 
             <div class="form-group">
@@ -43,7 +49,12 @@
 
             <div class="form-group">
               <label for="expiryDate">Date de péremption *</label>
-              <input id="expiryDate" type="date" formControlName="expiryDate" class="form-control" />
+              <input
+                id="expiryDate"
+                type="date"
+                formControlName="expiryDate"
+                class="form-control"
+              />
             </div>
           </div>
 
@@ -51,9 +62,7 @@
             <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
               {{ selectedStockItem() ? 'Modifier' : 'Ajouter' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="closeForm()">
-              Annuler
-            </button>
+            <button type="button" class="btn btn-secondary" (click)="closeForm()">Annuler</button>
           </div>
         </form>
       </div>
@@ -61,13 +70,13 @@
   }
 
   <div class="stock-grid">
-    @if(stock().length === 0) {
+    @if (stock().length === 0) {
       <div class="empty-state">
         <p>Aucun stock pour le moment. Commencez par en ajouter !</p>
       </div>
     }
 
-    @for(item of stock(); track item.id) {
+    @for (item of stock(); track item.id) {
       <div class="stock-card" [ngClass]="getExpiryStatusClass(item)">
         <div class="stock-header">
           <h3>{{ getIngredientName(item.ingredientId) }}</h3>

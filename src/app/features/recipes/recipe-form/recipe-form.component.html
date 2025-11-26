@@ -9,28 +9,28 @@
 
       <div class="form-group">
         <label for="name">Nom de la recette *</label>
-        <input 
-          id="name" 
-          type="text" 
-          formControlName="name" 
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
           class="form-control"
           [class.input-error]="form.get('name')?.invalid && form.get('name')?.touched"
         />
-        @if(form.get('name')?.invalid && form.get('name')?.touched) {
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
           <span class="error">{{ getFieldError('name') }}</span>
         }
       </div>
 
       <div class="form-group">
         <label for="description">Description *</label>
-        <textarea 
-          id="description" 
-          formControlName="description" 
-          class="form-control" 
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control"
           rows="3"
           [class.input-error]="form.get('description')?.invalid && form.get('description')?.touched"
         ></textarea>
-        @if(form.get('description')?.invalid && form.get('description')?.touched) {
+        @if (form.get('description')?.invalid && form.get('description')?.touched) {
           <span class="error">{{ getFieldError('description') }}</span>
         }
       </div>
@@ -38,9 +38,9 @@
       <div class="form-row">
         <div class="form-group">
           <label for="category">Catégorie *</label>
-          <select 
-            id="category" 
-            formControlName="category" 
+          <select
+            id="category"
+            formControlName="category"
             class="form-control"
             [class.input-error]="form.get('category')?.invalid && form.get('category')?.touched"
           >
@@ -52,21 +52,21 @@
             <option value="Petit-déjeuner">Petit-déjeuner</option>
             <option value="Autre">Autre</option>
           </select>
-          @if(form.get('category')?.invalid && form.get('category')?.touched) {
+          @if (form.get('category')?.invalid && form.get('category')?.touched) {
             <span class="error">{{ getFieldError('category') }}</span>
           }
         </div>
 
         <div class="form-group">
           <label for="servings">Portions *</label>
-          <input 
-            id="servings" 
-            type="number" 
-            formControlName="servings" 
+          <input
+            id="servings"
+            type="number"
+            formControlName="servings"
             class="form-control"
             [class.input-error]="form.get('servings')?.invalid && form.get('servings')?.touched"
           />
-          @if(form.get('servings')?.invalid && form.get('servings')?.touched) {
+          @if (form.get('servings')?.invalid && form.get('servings')?.touched) {
             <span class="error">{{ getFieldError('servings') }}</span>
           }
         </div>
@@ -75,28 +75,28 @@
       <div class="form-row">
         <div class="form-group">
           <label for="prepTime">Temps de préparation (min) *</label>
-          <input 
-            id="prepTime" 
-            type="number" 
-            formControlName="prepTime" 
+          <input
+            id="prepTime"
+            type="number"
+            formControlName="prepTime"
             class="form-control"
             [class.input-error]="form.get('prepTime')?.invalid && form.get('prepTime')?.touched"
           />
-          @if(form.get('prepTime')?.invalid && form.get('prepTime')?.touched) {
+          @if (form.get('prepTime')?.invalid && form.get('prepTime')?.touched) {
             <span class="error">{{ getFieldError('prepTime') }}</span>
           }
         </div>
 
         <div class="form-group">
           <label for="cookTime">Temps de cuisson (min) *</label>
-          <input 
-            id="cookTime" 
-            type="number" 
-            formControlName="cookTime" 
+          <input
+            id="cookTime"
+            type="number"
+            formControlName="cookTime"
             class="form-control"
             [class.input-error]="form.get('cookTime')?.invalid && form.get('cookTime')?.touched"
           />
-          @if(form.get('cookTime')?.invalid && form.get('cookTime')?.touched) {
+          @if (form.get('cookTime')?.invalid && form.get('cookTime')?.touched) {
             <span class="error">{{ getFieldError('cookTime') }}</span>
           }
         </div>
@@ -104,22 +104,30 @@
 
       <div class="form-group">
         <label for="image">Image de la recette</label>
-        
-        @if(imagePreview()) {
+
+        @if (imagePreview()) {
           <div class="image-preview">
             <img [src]="imagePreview()" alt="Aperçu" />
-            <button type="button" class="btn-remove-image" (click)="removeImage()">Supprimer l'image</button>
+            <button type="button" class="btn-remove-image" (click)="removeImage()">
+              Supprimer l'image
+            </button>
           </div>
         } @else {
-          <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" class="form-control" />
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            class="form-control"
+          />
         }
-
       </div>
-
     </div>
 
     <div class="form-section">
-      <h3>Ingrédients * <span class="section-hint">{{ selectedIngredients().length }} ajouté(s)</span></h3>
+      <h3>
+        Ingrédients * <span class="section-hint">{{ selectedIngredients().length }} ajouté(s)</span>
+      </h3>
 
       <div class="add-ingredient">
         <div class="form-row">
@@ -127,7 +135,7 @@
             <label for="ingredientId">Ingrédient</label>
             <select id="ingredientId" formControlName="ingredientId" class="form-control">
               <option value="">-- Sélectionner --</option>
-              @for(ingredient of availableIngredients(); track ingredient.id) {
+              @for (ingredient of availableIngredients(); track ingredient.id) {
                 <option [value]="ingredient.id">
                   {{ ingredient.name }}
                 </option>
@@ -137,7 +145,13 @@
 
           <div class="form-group">
             <label for="quantity">Quantité</label>
-            <input id="quantity" type="number" formControlName="quantity" class="form-control" step="0.1" />
+            <input
+              id="quantity"
+              type="number"
+              formControlName="quantity"
+              class="form-control"
+              step="0.1"
+            />
           </div>
 
           <div class="form-group">
@@ -153,9 +167,9 @@
             </select>
           </div>
 
-          <button 
-            type="button" 
-            class="btn btn-secondary" 
+          <button
+            type="button"
+            class="btn btn-secondary"
             (click)="addIngredient()"
             [disabled]="!isIngredientFieldsValid()"
           >
@@ -164,19 +178,25 @@
         </div>
       </div>
 
-      @if(selectedIngredients().length > 0) {
+      @if (selectedIngredients().length > 0) {
         <div class="ingredients-list">
-          @for(ingredient of selectedIngredients(); track ingredient.ingredientId) {
+          @for (ingredient of selectedIngredients(); track ingredient.ingredientId) {
             <div class="ingredient-item">
               <span>{{ getIngredientName(ingredient.ingredientId) }}</span>
               <span>{{ ingredient.quantity }} {{ ingredient.unit }}</span>
-              <button type="button" class="btn-remove" (click)="removeIngredient(ingredient.ingredientId)">✕</button>
+              <button
+                type="button"
+                class="btn-remove"
+                (click)="removeIngredient(ingredient.ingredientId)"
+              >
+                ✕
+              </button>
             </div>
           }
         </div>
       }
 
-      @if(selectedIngredients().length === 0) {
+      @if (selectedIngredients().length === 0) {
         <div class="validation-hint">
           <span class="hint-error">Au moins un ingrédient est requis</span>
         </div>
@@ -184,7 +204,9 @@
     </div>
 
     <div class="form-section">
-      <h3>Étapes de la recette * <span class="section-hint">{{ steps().length }} ajoutée(s)</span></h3>
+      <h3>
+        Étapes de la recette * <span class="section-hint">{{ steps().length }} ajoutée(s)</span>
+      </h3>
 
       <div class="add-step">
         <input
@@ -194,9 +216,9 @@
           class="form-control"
           placeholder="Ajouter une étape..."
         />
-        <button 
-          type="button" 
-          class="btn btn-secondary" 
+        <button
+          type="button"
+          class="btn btn-secondary"
           (click)="addStep()"
           [disabled]="!canAddStep()"
         >
@@ -204,9 +226,9 @@
         </button>
       </div>
 
-      @if(steps().length > 0) {
+      @if (steps().length > 0) {
         <ol class="steps-list">
-          @for(step of steps(); track $index) {
+          @for (step of steps(); track $index) {
             <li class="step-item">
               <span>{{ step }}</span>
               <button type="button" class="btn-remove" (click)="removeStep($index)">✕</button>
@@ -215,7 +237,7 @@
         </ol>
       }
 
-      @if(steps().length === 0) {
+      @if (steps().length === 0) {
         <div class="validation-hint">
           <span class="hint-error">Au moins une étape est requise</span>
         </div>
@@ -223,21 +245,15 @@
     </div>
 
     <div class="form-actions">
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         class="btn btn-primary"
         [disabled]="!isFormValid()"
         [title]="!isFormValid() ? 'Veuillez remplir tous les champs requis' : ''"
       >
         {{ _recipe ? 'Modifier' : 'Créer' }} la recette
       </button>
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
-        (click)="closeForm()"
-      >
-        Annuler
-      </button>
+      <button type="button" class="btn btn-secondary" (click)="closeForm()">Annuler</button>
     </div>
   </form>
 </div>

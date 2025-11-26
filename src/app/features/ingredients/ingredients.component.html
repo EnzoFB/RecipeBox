@@ -23,7 +23,13 @@
     </div>
   </div>
 
-  <div *ngIf="showForm()" class="modal-overlay" (click)="closeForm()" role="presentation" tabindex="-1">
+  <div
+    *ngIf="showForm()"
+    class="modal-overlay"
+    (click)="closeForm()"
+    role="presentation"
+    tabindex="-1"
+  >
     <div class="modal-content" (click)="$event.stopPropagation()" role="presentation" tabindex="-1">
       <app-ingredient-form
         [ingredient]="selectedIngredient()"
@@ -63,7 +69,9 @@
           <td>{{ ingredient.carbs || '-' }}g</td>
           <td>{{ ingredient.fats || '-' }}g</td>
           <td class="actions-cell">
-            <button class="btn btn-small btn-secondary" (click)="openEditForm(ingredient)">Modifier</button>
+            <button class="btn btn-small btn-secondary" (click)="openEditForm(ingredient)">
+              Modifier
+            </button>
             <button class="btn btn-small btn-danger" (click)="onDeleteIngredient(ingredient.id!)">
               Supprimer
             </button>

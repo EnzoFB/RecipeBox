@@ -27,7 +27,13 @@
   <div class="results-container">
     @if (recipes().length === 0) {
       <div class="empty-state">
-        <p>{{ searchQuery() ? 'Aucune recette trouvée.' : 'Commencez une recherche pour voir les résultats.' }}</p>
+        <p>
+          {{
+            searchQuery()
+              ? 'Aucune recette trouvée.'
+              : 'Commencez une recherche pour voir les résultats.'
+          }}
+        </p>
       </div>
     }
 
@@ -37,35 +43,35 @@
       </div>
     }
 
-
     <div class="recipes-list">
       @for (recipe of recipes(); track $index) {
-        <div class="recipe-result" (click)="viewRecipe(recipe)" (keypress)="viewRecipe(recipe)" tabindex="0">
+        <div
+          class="recipe-result"
+          (click)="viewRecipe(recipe)"
+          (keypress)="viewRecipe(recipe)"
+          tabindex="0"
+        >
           <div class="recipe-header">
             <h3>{{ recipe.name }}</h3>
             <span class="category-badge">{{ recipe.category }}</span>
           </div>
-  
+
           <p class="recipe-description">{{ recipe.description }}</p>
-  
+
           <div class="recipe-meta">
             <span class="meta-item">
               <strong>⏱️ Temps total :</strong> {{ getTotalTime(recipe) }} min
             </span>
-            <span class="meta-item">
-              <strong>👥 Portions :</strong> {{ recipe.servings }}
-            </span>
+            <span class="meta-item"> <strong>👥 Portions :</strong> {{ recipe.servings }} </span>
           </div>
-  
+
           <div class="recipe-stats">
             <span class="stat">
               <strong>Ingrédients :</strong> {{ recipe.ingredients?.length }}
             </span>
-            <span class="stat">
-              <strong>Étapes :</strong> {{ recipe.steps?.length }}
-            </span>
+            <span class="stat"> <strong>Étapes :</strong> {{ recipe.steps?.length }} </span>
           </div>
-  
+
           <div *ngIf="selectedRecipe() === recipe" class="recipe-detail">
             <div class="detail-section">
               <h4>Ingrédients</h4>
@@ -76,18 +82,18 @@
                 </li>
               </ul>
             </div>
-  
+
             <div class="detail-section">
               <h4>Préparation</h4>
               <ol>
-                @for(step of recipe.steps; track step) {
+                @for (step of recipe.steps; track step) {
                   <li>
                     {{ step }}
                   </li>
                 }
               </ol>
             </div>
-  
+
             <button class="btn btn-secondary" (click)="closeDetail()">Fermer</button>
           </div>
         </div>

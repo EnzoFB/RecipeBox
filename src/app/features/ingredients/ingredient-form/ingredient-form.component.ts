@@ -6,7 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Ingredient, INGREDIENT_CATEGORIES } from '../../../core/models';
+import { Ingredient, INGREDIENT_CATEGORIES, Unit } from '../../../core/models';
+import { UnitService } from '../../../core/services';
 
 @Component({
   selector: 'app-ingredient-form',
@@ -27,19 +28,21 @@ import { Ingredient, INGREDIENT_CATEGORIES } from '../../../core/models';
 export class IngredientFormComponent implements OnInit {
   form!: FormGroup;
   categories = INGREDIENT_CATEGORIES;
-  units = ['g', 'kg', 'ml', 'l', 'c. à soupe', 'c. à café', 'unité'];
+  units: Unit[] = [];
   isEditMode = false;
   imagePreview: string | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
+    private readonly unitService: UnitService,
     public dialogRef: MatDialogRef<IngredientFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { ingredient: Ingredient | null }
   ) {
+    this.units = this.unitService.getUnitsSync();
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       category: ['', Validators.required],
-      unit: ['g', Validators.required],
+      unitId: ['', Validators.required],
       image: [''],
       calories: [0, [Validators.required, Validators.min(0)]],
       protein: [0, [Validators.required, Validators.min(0)]],
@@ -49,6 +52,9 @@ export class IngredientFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (!this.units.length) {
+      this.units = this.unitService.getUnitsSync();
+    }
     if (this.data.ingredient) {
       this.isEditMode = true;
       this.populateForm(this.data.ingredient);
@@ -59,7 +65,7 @@ export class IngredientFormComponent implements OnInit {
     this.form.patchValue({
       name: ingredient.name,
       category: ingredient.category,
-      unit: ingredient.unit,
+      unitId: ingredient.unitId,
       image: ingredient.image || '',
       calories: ingredient.calories || 0,
       protein: ingredient.protein || 0,
@@ -101,7 +107,7 @@ export class IngredientFormComponent implements OnInit {
     const formData: Omit<Ingredient, 'id'> = {
       name: this.form.get('name')?.value,
       category: this.form.get('category')?.value,
-      unit: this.form.get('unit')?.value,
+      unitId: this.form.get('unitId')?.value,
       image: this.form.get('image')?.value || undefined,
       calories: this.form.get('calories')?.value,
       protein: this.form.get('protein')?.value,

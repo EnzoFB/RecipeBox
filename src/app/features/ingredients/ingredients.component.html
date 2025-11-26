@@ -50,7 +50,7 @@
         <mat-card-content>
           <div class="ingredient-info">
             <span class="info-item">
-              <strong>Unité:</strong> {{ ingredient.unit }}
+              <strong>Unité:</strong> {{ getUnitName(ingredient.unitId) }}
             </span>
             <span class="info-item">
               <strong>Calories (100g):</strong> {{ ingredient.calories || '-' }} kcal

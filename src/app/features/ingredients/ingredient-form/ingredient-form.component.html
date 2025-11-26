@@ -31,9 +31,9 @@
       <div class="form-group">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Unité *</mat-label>
-          <mat-select formControlName="unit">
-            @for (u of units; track u) {
-              <mat-option [value]="u">{{ u }}</mat-option>
+          <mat-select formControlName="unitId">
+            @for (u of units; track u.id) {
+              <mat-option [value]="u.id">{{ u.symbol }} - {{ u.name }}</mat-option>
             }
           </mat-select>
         </mat-form-field>

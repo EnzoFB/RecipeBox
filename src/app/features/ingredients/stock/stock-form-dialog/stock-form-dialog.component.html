@@ -18,18 +18,20 @@
     <div class="form-group">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Quantité *</mat-label>
-        <input matInput type="number" formControlName="quantity" step="0.1" />
+        <input matInput type="number" formControlName="quantity" step="1" />
       </mat-form-field>
     </div>
 
     <div class="form-group">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Unité *</mat-label>
-        <mat-select formControlName="unit">
-          @for (u of units; track u) {
-            <mat-option [value]="u">{{ u }}</mat-option>
-          }
-        </mat-select>
+        <mat-label>Unité (définie par l'ingrédient)</mat-label>
+        <input 
+          matInput 
+          type="text" 
+          [value]="selectedUnit ? (selectedUnit.name + ' (' + selectedUnit.symbol + ')') : '-'" 
+          readonly 
+          disabled
+        />
       </mat-form-field>
     </div>
   </div>
@@ -48,7 +50,7 @@
     mat-raised-button
     color="primary"
     (click)="onSubmit()"
-    [disabled]="!form.valid"
+    [disabled]="!form.valid || !selectedUnit"
   >
     {{ isEditMode ? 'Modifier' : 'Ajouter' }}
   </button>

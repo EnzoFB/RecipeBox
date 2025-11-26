@@ -21,20 +21,30 @@ interface TableSchema {
 // ============================================================================
 
 const SCHEMAS: Record<string, TableSchema> = {
+  units: {
+    name: 'units',
+    sql: `CREATE TABLE IF NOT EXISTS units (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE,
+      symbol TEXT NOT NULL UNIQUE,
+      description TEXT
+    )`
+  },
   ingredients: {
     name: 'ingredients',
     sql: `CREATE TABLE IF NOT EXISTS ingredients (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
       category TEXT DEFAULT 'Autre',
-      unit TEXT,
+      unitId INTEGER,
       image TEXT,
       calories INTEGER,
       protein REAL,
       carbs REAL,
       fat REAL,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (unitId) REFERENCES units(id) ON DELETE SET NULL
     )`
   },
   recipes: {
@@ -91,7 +101,8 @@ const SCHEMAS: Record<string, TableSchema> = {
 
 const MIGRATIONS = [
   { table: 'recipes', column: 'image', type: 'TEXT' },
-  { table: 'ingredients', column: 'image', type: 'TEXT' }
+  { table: 'ingredients', column: 'image', type: 'TEXT' },
+  { table: 'ingredients', column: 'unitId', type: 'INTEGER REFERENCES units(id) ON DELETE SET NULL' }
 ];
 
 // ============================================================================
@@ -165,6 +176,7 @@ class DatabaseManager {
       }
 
       this.logInfo('Loading mock data...');
+      await this.insertDefaultUnits();
       const ingredientIds = await this.insertMockIngredients();
       await this.insertMockRecipes(ingredientIds);
       this.logInfo('✓ Mock data loaded successfully');
@@ -174,34 +186,67 @@ class DatabaseManager {
     }
   }
 
+  private async insertDefaultUnits(): Promise<void> {
+    const units = [
+      { name: 'Gramme', symbol: 'g', description: 'Unité de masse' },
+      { name: 'Kilogramme', symbol: 'kg', description: 'Kilogramme' },
+      { name: 'Millilitre', symbol: 'ml', description: 'Unité de volume' },
+      { name: 'Litre', symbol: 'L', description: 'Litre' },
+      { name: 'Centilitre', symbol: 'cl', description: 'Centilitre' },
+      { name: 'Cuillère à café', symbol: 'cac', description: 'Cuillère à café (~5ml)' },
+      { name: 'Cuillère à soupe', symbol: 'cas', description: 'Cuillère à soupe (~15ml)' },
+      { name: 'Verre', symbol: 'verre', description: 'Verre (~250ml)' },
+      { name: 'Unité', symbol: 'unité', description: 'Nombre d\'éléments' },
+      { name: 'Pincée', symbol: 'pincée', description: 'Pincée' }
+    ];
+
+    for (const unit of units) {
+      await this.runAsync({
+        sql: 'INSERT OR IGNORE INTO units (name, symbol, description) VALUES (?, ?, ?)',
+        params: [unit.name, unit.symbol, unit.description]
+      });
+    }
+
+    this.logInfo('✓ Default units inserted');
+  }
+
   private async insertMockIngredients(): Promise<Record<string, number>> {
     const mockIngredients = [
-      { name: 'Pâtes', category: 'Féculents', unit: 'g', calories: 131, protein: 5, carbs: 25, fat: 1.1 },
-      { name: 'Lard', category: 'Protéines', unit: 'g', calories: 541, protein: 37, carbs: 0, fat: 43 },
-      { name: 'Œuf', category: 'Produits laitiers', unit: 'unité', calories: 155, protein: 13, carbs: 1.1, fat: 11 },
-      { name: 'Fromage Parmesan', category: 'Produits laitiers', unit: 'g', calories: 392, protein: 38, carbs: 4, fat: 26 },
-      { name: 'Laitue', category: 'Légumes', unit: 'g', calories: 15, protein: 1.2, carbs: 2.9, fat: 0.2 },
-      { name: 'Tomate', category: 'Fruits', unit: 'g', calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2 },
-      { name: 'Anchois', category: 'Protéines', unit: 'g', calories: 210, protein: 29, carbs: 0, fat: 11 },
-      { name: 'Olives', category: 'Fruits', unit: 'g', calories: 115, protein: 1.5, carbs: 3, fat: 11 },
-      { name: 'Crème fraîche', category: 'Produits laitiers', unit: 'g', calories: 340, protein: 2.5, carbs: 3, fat: 36 },
-      { name: 'Champignons', category: 'Légumes', unit: 'g', calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3 },
-      { name: 'Oignon', category: 'Légumes', unit: 'g', calories: 40, protein: 1.1, carbs: 9, fat: 0.1 },
-      { name: 'Ail', category: 'Condiments', unit: 'g', calories: 149, protein: 6.4, carbs: 33, fat: 0.5 }
+      { name: 'Pâtes', category: 'Féculents', unit: 'Gramme', calories: 131, protein: 5, carbs: 25, fat: 1.1 },
+      { name: 'Lard', category: 'Protéines', unit: 'Gramme', calories: 541, protein: 37, carbs: 0, fat: 43 },
+      { name: 'Œuf', category: 'Produits laitiers', unit: 'Unité', calories: 155, protein: 13, carbs: 1.1, fat: 11 },
+      { name: 'Fromage Parmesan', category: 'Produits laitiers', unit: 'Gramme', calories: 392, protein: 38, carbs: 4, fat: 26 },
+      { name: 'Laitue', category: 'Légumes', unit: 'Gramme', calories: 15, protein: 1.2, carbs: 2.9, fat: 0.2 },
+      { name: 'Tomate', category: 'Fruits', unit: 'Gramme', calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2 },
+      { name: 'Anchois', category: 'Protéines', unit: 'Gramme', calories: 210, protein: 29, carbs: 0, fat: 11 },
+      { name: 'Olives', category: 'Fruits', unit: 'Gramme', calories: 115, protein: 1.5, carbs: 3, fat: 11 },
+      { name: 'Crème fraîche', category: 'Produits laitiers', unit: 'Gramme', calories: 340, protein: 2.5, carbs: 3, fat: 36 },
+      { name: 'Champignons', category: 'Légumes', unit: 'Gramme', calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3 },
+      { name: 'Oignon', category: 'Légumes', unit: 'Gramme', calories: 40, protein: 1.1, carbs: 9, fat: 0.1 },
+      { name: 'Ail', category: 'Condiments', unit: 'Gramme', calories: 149, protein: 6.4, carbs: 33, fat: 0.5 }
     ];
 
     const ingredientIds: Record<string, number> = {};
 
     for (const ing of mockIngredients) {
-      const id = await this.insertIngredient(ing);
+      const unitId = await this.getUnitIdByName(ing.unit);
+      const id = await this.insertIngredient(ing, unitId);
       ingredientIds[ing.name] = id;
     }
 
     return ingredientIds;
   }
 
-  private async insertIngredient(ingredient: any): Promise<number> {
-    const sql = `INSERT OR IGNORE INTO ingredients (name, category, unit, calories, protein, carbs, fat)
+  private async getUnitIdByName(unitName: string): Promise<number> {
+    const unit = await this.getAsync<{ id: number }>(
+      'SELECT id FROM units WHERE name = ?',
+      [unitName]
+    );
+    return unit?.id || 1; // Default to 'Gramme' if not found
+  }
+
+  private async insertIngredient(ingredient: any, unitId?: number): Promise<number> {
+    const sql = `INSERT OR IGNORE INTO ingredients (name, category, unitId, calories, protein, carbs, fat)
                  VALUES (?, ?, ?, ?, ?, ?, ?)`;
     
     await this.runAsync({
@@ -209,7 +254,7 @@ class DatabaseManager {
       params: [
         ingredient.name,
         ingredient.category,
-        ingredient.unit,
+        unitId || 1,
         ingredient.calories,
         ingredient.protein,
         ingredient.carbs,

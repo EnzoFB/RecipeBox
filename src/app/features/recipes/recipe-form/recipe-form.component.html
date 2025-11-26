@@ -16,9 +16,9 @@
           class="form-control"
           [class.input-error]="form.get('name')?.invalid && form.get('name')?.touched"
         />
-        <span class="error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
-          {{ getFieldError('name') }}
-        </span>
+        @if(form.get('name')?.invalid && form.get('name')?.touched) {
+          <span class="error">{{ getFieldError('name') }}</span>
+        }
       </div>
 
       <div class="form-group">
@@ -30,9 +30,9 @@
           rows="3"
           [class.input-error]="form.get('description')?.invalid && form.get('description')?.touched"
         ></textarea>
-        <span class="error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
-          {{ getFieldError('description') }}
-        </span>
+        @if(form.get('description')?.invalid && form.get('description')?.touched) {
+          <span class="error">{{ getFieldError('description') }}</span>
+        }
       </div>
 
       <div class="form-row">
@@ -52,9 +52,9 @@
             <option value="Petit-déjeuner">Petit-déjeuner</option>
             <option value="Autre">Autre</option>
           </select>
-          <span class="error" *ngIf="form.get('category')?.invalid && form.get('category')?.touched">
-            {{ getFieldError('category') }}
-          </span>
+          @if(form.get('category')?.invalid && form.get('category')?.touched) {
+            <span class="error">{{ getFieldError('category') }}</span>
+          }
         </div>
 
         <div class="form-group">
@@ -66,9 +66,9 @@
             class="form-control"
             [class.input-error]="form.get('servings')?.invalid && form.get('servings')?.touched"
           />
-          <span class="error" *ngIf="form.get('servings')?.invalid && form.get('servings')?.touched">
-            {{ getFieldError('servings') }}
-          </span>
+          @if(form.get('servings')?.invalid && form.get('servings')?.touched) {
+            <span class="error">{{ getFieldError('servings') }}</span>
+          }
         </div>
       </div>
 
@@ -82,9 +82,9 @@
             class="form-control"
             [class.input-error]="form.get('prepTime')?.invalid && form.get('prepTime')?.touched"
           />
-          <span class="error" *ngIf="form.get('prepTime')?.invalid && form.get('prepTime')?.touched">
-            {{ getFieldError('prepTime') }}
-          </span>
+          @if(form.get('prepTime')?.invalid && form.get('prepTime')?.touched) {
+            <span class="error">{{ getFieldError('prepTime') }}</span>
+          }
         </div>
 
         <div class="form-group">
@@ -96,21 +96,26 @@
             class="form-control"
             [class.input-error]="form.get('cookTime')?.invalid && form.get('cookTime')?.touched"
           />
-          <span class="error" *ngIf="form.get('cookTime')?.invalid && form.get('cookTime')?.touched">
-            {{ getFieldError('cookTime') }}
-          </span>
+          @if(form.get('cookTime')?.invalid && form.get('cookTime')?.touched) {
+            <span class="error">{{ getFieldError('cookTime') }}</span>
+          }
         </div>
       </div>
 
       <div class="form-group">
         <label for="image">Image de la recette</label>
-        <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" class="form-control" />
+        
+        @if(imagePreview()) {
+          <div class="image-preview">
+            <img [src]="imagePreview()" alt="Aperçu" />
+            <button type="button" class="btn-remove-image" (click)="removeImage()">Supprimer l'image</button>
+          </div>
+        } @else {
+          <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" class="form-control" />
+        }
+
       </div>
 
-      <div class="image-preview" *ngIf="imagePreview()">
-        <img [src]="imagePreview()" alt="Aperçu" />
-        <button type="button" class="btn-remove-image" (click)="removeImage()">Supprimer l'image</button>
-      </div>
     </div>
 
     <div class="form-section">
@@ -122,9 +127,11 @@
             <label for="ingredientId">Ingrédient</label>
             <select id="ingredientId" formControlName="ingredientId" class="form-control">
               <option value="">-- Sélectionner --</option>
-              <option *ngFor="let ingredient of availableIngredients()" [value]="ingredient.id">
-                {{ ingredient.name }}
-              </option>
+              @for(ingredient of availableIngredients(); track ingredient.id) {
+                <option [value]="ingredient.id">
+                  {{ ingredient.name }}
+                </option>
+              }
             </select>
           </div>
 
@@ -157,17 +164,23 @@
         </div>
       </div>
 
-      <div class="ingredients-list" *ngIf="selectedIngredients().length > 0">
-        <div *ngFor="let ingredient of selectedIngredients(); let i = index" class="ingredient-item">
-          <span>{{ getIngredientName(ingredient.ingredientId) }}</span>
-          <span>{{ ingredient.quantity }} {{ ingredient.unit }}</span>
-          <button type="button" class="btn-remove" (click)="removeIngredient(i)">✕</button>
+      @if(selectedIngredients().length > 0) {
+        <div class="ingredients-list">
+          @for(ingredient of selectedIngredients(); track ingredient.ingredientId) {
+            <div class="ingredient-item">
+              <span>{{ getIngredientName(ingredient.ingredientId) }}</span>
+              <span>{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+              <button type="button" class="btn-remove" (click)="removeIngredient(ingredient.ingredientId)">✕</button>
+            </div>
+          }
         </div>
-      </div>
+      }
 
-      <div class="validation-hint" *ngIf="selectedIngredients().length === 0">
-        <span class="hint-error">Au moins un ingrédient est requis</span>
-      </div>
+      @if(selectedIngredients().length === 0) {
+        <div class="validation-hint">
+          <span class="hint-error">Au moins un ingrédient est requis</span>
+        </div>
+      }
     </div>
 
     <div class="form-section">
@@ -191,16 +204,22 @@
         </button>
       </div>
 
-      <ol class="steps-list" *ngIf="steps().length > 0">
-        <li *ngFor="let step of steps(); let i = index" class="step-item">
-          <span>{{ step }}</span>
-          <button type="button" class="btn-remove" (click)="removeStep(i)">✕</button>
-        </li>
-      </ol>
+      @if(steps().length > 0) {
+        <ol class="steps-list">
+          @for(step of steps(); track $index) {
+            <li class="step-item">
+              <span>{{ step }}</span>
+              <button type="button" class="btn-remove" (click)="removeStep($index)">✕</button>
+            </li>
+          }
+        </ol>
+      }
 
-      <div class="validation-hint" *ngIf="steps().length === 0">
-        <span class="hint-error">Au moins une étape est requise</span>
-      </div>
+      @if(steps().length === 0) {
+        <div class="validation-hint">
+          <span class="hint-error">Au moins une étape est requise</span>
+        </div>
+      }
     </div>
 
     <div class="form-actions">

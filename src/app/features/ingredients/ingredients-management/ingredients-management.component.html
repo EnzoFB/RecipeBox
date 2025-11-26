@@ -1,85 +1,81 @@
-<div class="management-container">
-  <div class="header">
-    <h1>🥬 Gestion des Ingrédients</h1>
-    <button mat-raised-button color="primary" (click)="openAddForm()">
-      + Ajouter un ingrédient
-    </button>
-  </div>
+<div class="header">
+  <h1>🥬 Gestion des Ingrédients</h1>
+  <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter un ingrédient</button>
+</div>
 
-  <div class="search-section">
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Rechercher un ingrédient..."
-      [(ngModel)]="searchQuery"
-      (input)="onSearch()"
-    />
-    <span class="ingredient-count">{{ filteredIngredients.length }} ingrédient(s)</span>
-  </div>
+<div class="search-section">
+  <input
+    type="text"
+    class="search-input"
+    placeholder="Rechercher un ingrédient..."
+    [(ngModel)]="searchQuery"
+    (input)="onSearch()"
+  />
+  <span class="ingredient-count">{{ filteredIngredients.length }} ingrédient(s)</span>
+</div>
 
-  <div class="ingredients-table-container">
-    @if (filteredIngredients.length === 0) {
-      <div class="empty-state">
-        <p>🥘 Aucun ingrédient trouvé.</p>
-        <small>Commencez par en ajouter un !</small>
-      </div>
-    } @else {
-      <table class="ingredients-table">
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Nom</th>
-            <th>Catégorie</th>
-            <th>Unité</th>
-            <th>Calories</th>
-            <th>Actions</th>
+<div class="ingredients-table-container">
+  @if (filteredIngredients.length === 0) {
+    <div class="empty-state">
+      <p>🥘 Aucun ingrédient trouvé.</p>
+      <small>Commencez par en ajouter un !</small>
+    </div>
+  } @else {
+    <table class="ingredients-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Nom</th>
+          <th>Catégorie</th>
+          <th>Unité</th>
+          <th>Calories</th>
+          <th class="actions-header">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ingredient of filteredIngredients; track ingredient.id) {
+          <tr class="ingredient-row">
+            <td class="image-cell">
+              @if (ingredient.image) {
+                <img [src]="ingredient.image" [alt]="ingredient.name" class="ingredient-thumb" />
+              } @else {
+                <div class="ingredient-thumb-placeholder">
+                  <span class="placeholder-icon">🥕</span>
+                </div>
+              }
+            </td>
+            <td>{{ ingredient.name }}</td>
+            <td>
+              <span class="category-badge">{{ ingredient.category }}</span>
+            </td>
+            <td>{{ getUnitName(ingredient.unitId) }}</td>
+            <td>{{ ingredient.calories || '-' }} kcal</td>
+            <td class="actions-cell">
+              <button
+                mat-icon-button
+                matTooltip="Modifier"
+                (click)="openEditForm(ingredient)"
+                class="edit-btn"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                matTooltip="Supprimer"
+                (click)="onDeleteIngredient(ingredient.id!)"
+                class="delete-btn"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (ingredient of filteredIngredients; track ingredient.id) {
-            <tr class="ingredient-row">
-              <td class="image-cell">
-                @if (ingredient.image) {
-                  <img [src]="ingredient.image" [alt]="ingredient.name" class="ingredient-thumb" />
-                } @else {
-                  <div class="ingredient-thumb-placeholder">
-                    <span class="placeholder-icon">🥕</span>
-                  </div>
-                }
-              </td>
-              <td>{{ ingredient.name }}</td>
-              <td>
-                <span class="category-badge">{{ ingredient.category }}</span>
-              </td>
-              <td>{{ getUnitName(ingredient.unitId) }}</td>
-              <td>{{ ingredient.calories || '-' }} kcal</td>
-              <td class="actions-cell">
-                <button
-                  mat-icon-button
-                  matTooltip="Modifier"
-                  (click)="openEditForm(ingredient)"
-                  class="edit-btn"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  matTooltip="Supprimer"
-                  (click)="onDeleteIngredient(ingredient.id!)"
-                  class="delete-btn"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
-  </div>
+        }
+      </tbody>
+    </table>
+  }
+</div>
 
-  <!-- Info -->
-  <div class="view-toggle">
-    <p class="toggle-info">💡 Utilisez cette page pour gérer TOUS vos ingrédients</p>
-  </div>
+<!-- Info -->
+<div class="view-toggle">
+  <p class="toggle-info">💡 Utilisez cette page pour gérer TOUS vos ingrédients</p>
 </div>

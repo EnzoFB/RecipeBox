@@ -1,7 +1,7 @@
 <div class="ingredients-container">
   <div class="header">
     <h1>🥬 Mes Ingrédients</h1>
-    <button class="btn btn-primary" (click)="openAddForm()">+ Ajouter un ingrédient</button>
+    <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter un ingrédient</button>
   </div>
 
   <div class="filters-section">
@@ -20,22 +20,6 @@
         <option value="">-- Toutes les catégories --</option>
         <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
       </select>
-    </div>
-  </div>
-
-  <div
-    *ngIf="showForm()"
-    class="modal-overlay"
-    (click)="closeForm()"
-    role="presentation"
-    tabindex="-1"
-  >
-    <div class="modal-content" (click)="$event.stopPropagation()" role="presentation" tabindex="-1">
-      <app-ingredient-form
-        [ingredient]="selectedIngredient()"
-        (save)="onSaveIngredient($event)"
-        (cancel)="closeForm()"
-      ></app-ingredient-form>
     </div>
   </div>
 
@@ -58,25 +42,27 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let ingredient of filteredIngredients" class="ingredient-row">
-          <td class="ingredient-name">{{ ingredient.name }}</td>
-          <td class="ingredient-category">
-            <span class="category-badge">{{ ingredient.category }}</span>
-          </td>
-          <td>{{ ingredient.unit }}</td>
-          <td>{{ ingredient.calories || '-' }} kcal</td>
-          <td>{{ ingredient.protein || '-' }}g</td>
-          <td>{{ ingredient.carbs || '-' }}g</td>
-          <td>{{ ingredient.fats || '-' }}g</td>
-          <td class="actions-cell">
-            <button class="btn btn-small btn-secondary" (click)="openEditForm(ingredient)">
-              Modifier
-            </button>
-            <button class="btn btn-small btn-danger" (click)="onDeleteIngredient(ingredient.id!)">
-              Supprimer
-            </button>
-          </td>
-        </tr>
+        @for(ingredient of filteredIngredients; track ingredient.id) {
+          <tr class="ingredient-row">
+            <td class="ingredient-name">{{ ingredient.name }}</td>
+            <td class="ingredient-category">
+              <span class="category-badge">{{ ingredient.category }}</span>
+            </td>
+            <td>{{ ingredient.unit }}</td>
+            <td>{{ ingredient.calories || '-' }} kcal</td>
+            <td>{{ ingredient.protein || '-' }}g</td>
+            <td>{{ ingredient.carbs || '-' }}g</td>
+            <td>{{ ingredient.fats || '-' }}g</td>
+            <td class="actions-cell">
+              <button mat-button (click)="openEditForm(ingredient)">
+                Modifier
+              </button>
+              <button mat-button color="warn" (click)="onDeleteIngredient(ingredient.id!)">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>

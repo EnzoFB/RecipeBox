@@ -1,73 +1,8 @@
 <div class="stock-container">
   <div class="header">
     <h1>📦 Gestion du Stock</h1>
-    <button class="btn btn-primary" (click)="openAddForm()">+ Ajouter au stock</button>
+    <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter au stock</button>
   </div>
-
-  @if (showForm()) {
-    <div class="modal-overlay" (click)="closeForm()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="form-header">
-          <h2>{{ selectedStockItem() ? 'Modifier le stock' : 'Ajouter au stock' }}</h2>
-        </div>
-
-        <form [formGroup]="form" (ngSubmit)="onSaveStock()">
-          <div class="form-group">
-            <label for="ingredientId">Ingrédient *</label>
-            <select id="ingredientId" formControlName="ingredientId" class="form-control">
-              <option value="">-- Sélectionner --</option>
-              <option *ngFor="let ing of availableIngredients()" [value]="ing.id">
-                {{ ing.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="quantity">Quantité *</label>
-              <input
-                id="quantity"
-                type="number"
-                formControlName="quantity"
-                class="form-control"
-                step="0.1"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="unit">Unité *</label>
-              <select id="unit" formControlName="unit" class="form-control">
-                <option value="g">g</option>
-                <option value="kg">kg</option>
-                <option value="ml">ml</option>
-                <option value="l">l</option>
-                <option value="c">c. à soupe</option>
-                <option value="cc">c. à café</option>
-                <option value="unité">unité</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="expiryDate">Date de péremption *</label>
-              <input
-                id="expiryDate"
-                type="date"
-                formControlName="expiryDate"
-                class="form-control"
-              />
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
-              {{ selectedStockItem() ? 'Modifier' : 'Ajouter' }}
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="closeForm()">Annuler</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
 
   <div class="stock-grid">
     @if (stock().length === 0) {
@@ -77,36 +12,36 @@
     }
 
     @for (item of stock(); track item.id) {
-      <div class="stock-card" [ngClass]="getExpiryStatusClass(item)">
-        <div class="stock-header">
+      <mat-card class="stock-card" [ngClass]="getExpiryStatusClass(item)">
+        <mat-card-header>
           <h3>{{ getIngredientName(item.ingredientId) }}</h3>
           <span class="category-badge">{{ item.category }}</span>
-        </div>
+        </mat-card-header>
 
-        <div class="stock-info">
+        <mat-card-content>
           <div class="info-row">
             <span class="label">Quantité:</span>
             <span class="value">{{ item.quantity }} {{ item.unit }}</span>
           </div>
           <div class="info-row">
-            <span class="label">Expiry:</span>
+            <span class="label">Expiration:</span>
             <span class="value" [ngClass]="{ 'expired-text': item.isExpired }">
               {{ item.expiryDate }}
             </span>
           </div>
           <div class="info-row">
-            <span class="label">Status:</span>
+            <span class="label">Statut:</span>
             <span class="value" [ngClass]="getExpiryStatusClass(item)">
               {{ getExpiryStatus(item) }}
             </span>
           </div>
-        </div>
+        </mat-card-content>
 
-        <div class="stock-actions">
-          <button class="btn btn-secondary" (click)="openEditForm(item)">Modifier</button>
-          <button class="btn btn-danger" (click)="onDeleteStock(item.id)">Supprimer</button>
-        </div>
-      </div>
+        <mat-card-actions>
+          <button mat-button (click)="openEditForm(item)">Modifier</button>
+          <button mat-button color="warn" (click)="onDeleteStock(item.id)">Supprimer</button>
+        </mat-card-actions>
+      </mat-card>
     }
   </div>
 </div>

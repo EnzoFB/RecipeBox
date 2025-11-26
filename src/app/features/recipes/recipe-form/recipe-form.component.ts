@@ -1,33 +1,32 @@
-import { Component, Input, OnInit, signal, ChangeDetectionStrategy, OnChanges, Output, EventEmitter } from '@angular/core';
+import { Component, Inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Recipe, Ingredient, RecipeFormData } from '../../../core/models';
 import { IngredientService } from '../../../core/services';
 
 @Component({
   selector: 'app-recipe-form',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule
+  ],
   templateUrl: './recipe-form.component.html',
   styleUrl: './recipe-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RecipeFormComponent implements OnInit, OnChanges {
-  @Input() set recipe(value: Recipe | null) {
-    this._recipe = value;
-    if (value) {
-      this.populateForm(value);
-    } else {
-      this.form.reset();
-      this.steps.set([]);
-      this.selectedIngredients.set([]);
-      this.imagePreview.set(null);
-      this.imageBase64.set(null);
-    }
-  }
-
-  @Output() save = new EventEmitter<RecipeFormData>();
-  @Output() formClosed = new EventEmitter<void>();
-
+export class RecipeFormComponent implements OnInit {
   form!: FormGroup;
   steps = signal<string[]>([]);
   selectedIngredients = signal<{ ingredientId: number; quantity: number; unit: string }[]>([]);
@@ -35,12 +34,13 @@ export class RecipeFormComponent implements OnInit, OnChanges {
   imagePreview = signal<string | null>(null);
   imageBase64 = signal<string | null>(null);
   newStep = '';
-
-  _recipe: Recipe | null = null;
+  isEditMode = false;
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly ingredientService: IngredientService
+    private readonly ingredientService: IngredientService,
+    public dialogRef: MatDialogRef<RecipeFormComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { recipe: Recipe | null }
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -59,17 +59,10 @@ export class RecipeFormComponent implements OnInit, OnChanges {
     this.ingredientService.getIngredients().subscribe(ingredients => {
       this.availableIngredients.set(ingredients);
     });
-  }
 
-  ngOnChanges(): void {
-    if (this._recipe) {
-      this.populateForm(this._recipe);
-    } else {
-      this.form.reset();
-      this.steps.set([]);
-      this.selectedIngredients.set([]);
-      this.imagePreview.set(null);
-      this.imageBase64.set(null);
+    if (this.data.recipe) {
+      this.isEditMode = true;
+      this.populateForm(this.data.recipe);
     }
   }
 
@@ -164,11 +157,11 @@ export class RecipeFormComponent implements OnInit, OnChanges {
     };
 
     console.log('Émission save avec:', formData);
-    this.save.emit(formData);
+    this.dialogRef.close(formData);
   }
 
   closeForm(): void {
-    this.formClosed.emit();
+    this.dialogRef.close();
   }
 
   getIngredientName(ingredientId: number): string {

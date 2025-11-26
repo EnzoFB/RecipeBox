@@ -1,35 +1,40 @@
-import { Component, Input, OnInit, output } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Ingredient, INGREDIENT_CATEGORIES } from '../../../core/models';
 
 @Component({
   selector: 'app-ingredient-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule
+  ],
   templateUrl: './ingredient-form.component.html',
   styleUrl: './ingredient-form.component.scss'
 })
 export class IngredientFormComponent implements OnInit {
-  @Input() set ingredient(value: Ingredient | null) {
-    this._ingredient = value;
-    if (value) {
-      this.populateForm(value);
-    } else {
-      this.form.reset();
-    }
-  }
-
   form!: FormGroup;
   categories = INGREDIENT_CATEGORIES;
   units = ['g', 'kg', 'ml', 'l', 'c. à soupe', 'c. à café', 'unité'];
+  isEditMode = false;
 
-  save = output<Omit<Ingredient, 'id'>>();
-  cancel = output<void>();
-
-  _ingredient: Ingredient | null = null;
-
-  constructor(private readonly fb: FormBuilder) {
+  constructor(
+    private readonly fb: FormBuilder,
+    public dialogRef: MatDialogRef<IngredientFormComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { ingredient: Ingredient | null }
+  ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       category: ['', Validators.required],
@@ -41,7 +46,12 @@ export class IngredientFormComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.data.ingredient) {
+      this.isEditMode = true;
+      this.populateForm(this.data.ingredient);
+    }
+  }
 
   private populateForm(ingredient: Ingredient): void {
     this.form.patchValue({
@@ -71,10 +81,10 @@ export class IngredientFormComponent implements OnInit {
       fats: this.form.get('fats')?.value
     };
 
-    this.save.emit(formData);
+    this.dialogRef.close(formData);
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.dialogRef.close();
   }
 }

@@ -6,11 +6,11 @@
 </mat-toolbar>
 
 <mat-sidenav-container class="app-container" autosize>
-  <mat-sidenav #sidenav class="sidenav" mode="side" [opened]="false">
+  <mat-sidenav #sidenav class="sidenav" mode="side" opened>
     <mat-nav-list>
       <button
         mat-list-item
-        (click)="navigateTo('recipes'); sidenav.toggle()"
+        (click)="navigateTo('recipes');"
         [class.active]="currentPage() === 'recipes'"
       >
         <mat-icon matListItemIcon>menu_book</mat-icon>
@@ -19,7 +19,7 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('ingredients'); sidenav.toggle()"
+        (click)="navigateTo('ingredients');"
         [class.active]="currentPage() === 'ingredients'"
       >
         <mat-icon matListItemIcon>restaurant</mat-icon>
@@ -28,7 +28,7 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('stock'); sidenav.toggle()"
+        (click)="navigateTo('stock');"
         [class.active]="currentPage() === 'stock'"
       >
         <mat-icon matListItemIcon>inventory_2</mat-icon>
@@ -37,7 +37,7 @@
 
       <button
         mat-list-item
-        (click)="navigateTo('search'); sidenav.toggle()"
+        (click)="navigateTo('search');"
         [class.active]="currentPage() === 'search'"
       >
         <mat-icon matListItemIcon>search</mat-icon>

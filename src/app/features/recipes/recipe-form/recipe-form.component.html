@@ -1,9 +1,8 @@
-<div class="recipe-form">
-  <div class="form-header">
-    <h2>{{ _recipe ? 'Modifier la recette' : 'Nouvelle recette' }}</h2>
-  </div>
+<h2 mat-dialog-title>
+  {{ isEditMode ? 'Modifier la recette' : 'Nouvelle recette' }}
+</h2>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()" mat-dialog-content class="recipe-form">
     <div class="form-section">
       <h3>Informations générales</h3>
 
@@ -247,13 +246,13 @@
     <div class="form-actions">
       <button
         type="submit"
-        class="btn btn-primary"
+        mat-raised-button
+        color="primary"
         [disabled]="!isFormValid()"
         [title]="!isFormValid() ? 'Veuillez remplir tous les champs requis' : ''"
       >
-        {{ _recipe ? 'Modifier' : 'Créer' }} la recette
+        {{ isEditMode ? 'Modifier' : 'Créer' }} la recette
       </button>
-      <button type="button" class="btn btn-secondary" (click)="closeForm()">Annuler</button>
+      <button type="button" mat-button (click)="closeForm()">Annuler</button>
     </div>
   </form>
-</div>

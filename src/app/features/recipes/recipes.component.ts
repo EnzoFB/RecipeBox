@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { Recipe } from '../../core/models';
@@ -14,6 +14,7 @@ import { RecipeFormComponent } from './recipe-form/recipe-form.component';
 
 @Component({
   selector: 'app-recipes',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -23,19 +24,19 @@ import { RecipeFormComponent } from './recipe-form/recipe-form.component';
     MatFormFieldModule,
     MatDialogModule,
     MatCardModule,
-    MatChipsModule,
-    RecipeFormComponent
+    MatChipsModule
   ],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
 export class RecipesComponent implements OnInit {
   recipes = signal<Recipe[]>([]);
-  selectedRecipe = signal<Recipe | null>(null);
-  showForm = signal(false);
   searchQuery = signal('');
 
-  constructor(private readonly recipeService: RecipeService) {}
+  constructor(
+    private readonly recipeService: RecipeService,
+    private readonly dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.recipeService.getRecipes().subscribe(recipes => {
@@ -44,30 +45,27 @@ export class RecipesComponent implements OnInit {
   }
 
   openAddForm(): void {
-    this.selectedRecipe.set(null);
-    this.showForm.set(true);
+    this.dialog.open(RecipeFormComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { recipe: null }
+    }).afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.recipeService.addRecipe(result);
+      }
+    });
   }
 
   openEditForm(recipe: Recipe): void {
-    this.selectedRecipe.set(recipe);
-    this.showForm.set(true);
-  }
-
-  closeForm(): void {
-    this.showForm.set(false);
-    this.selectedRecipe.set(null);
-  }
-
-  onSaveRecipe(recipe: any): void {
-    console.log('onSaveRecipe appelé avec:', recipe);
-    if (this.selectedRecipe()) {
-      console.log('Mise à jour de recette avec ID:', this.selectedRecipe()!.id!);
-      this.recipeService.updateRecipe(this.selectedRecipe()!.id!, recipe);
-    } else {
-      console.log('Ajout nouvelle recette');
-      this.recipeService.addRecipe(recipe);
-    }
-    this.closeForm();
+    this.dialog.open(RecipeFormComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { recipe }
+    }).afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.recipeService.updateRecipe(recipe.id!, result);
+      }
+    });
   }
 
   onDeleteRecipe(id: number): void {

@@ -1,83 +1,91 @@
-<div class="ingredient-form">
-  <div class="form-header">
-    <h2>{{ _ingredient ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}</h2>
-  </div>
+<h2 mat-dialog-title>
+  {{ isEditMode ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}
+</h2>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="form-section">
-      <h3>Informations générales</h3>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" mat-dialog-content>
+  <div class="form-section">
+    <h3>Informations générales</h3>
+
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nom de l'ingrédient *</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <mat-error>Le nom est requis (min. 2 caractères)</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Catégorie *</mat-label>
+          <mat-select formControlName="category">
+            @for (cat of categories; track cat) {
+              <mat-option [value]="cat">{{ cat }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
 
       <div class="form-group">
-        <label for="name">Nom de l'ingrédient *</label>
-        <input id="name" type="text" formControlName="name" class="form-control" />
-        <span class="error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
-          Le nom est requis (min. 2 caractères)
-        </span>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Unité *</mat-label>
+          <mat-select formControlName="unit">
+            @for (u of units; track u) {
+              <mat-option [value]="u">{{ u }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Informations nutritionnelles (pour 100g)</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Calories (kcal)</mat-label>
+          <input matInput type="number" formControlName="calories" step="0.1" />
+        </mat-form-field>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="category">Catégorie *</label>
-          <select id="category" formControlName="category" class="form-control">
-            <option value="">-- Sélectionner --</option>
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="unit">Unité *</label>
-          <select id="unit" formControlName="unit" class="form-control">
-            <option *ngFor="let u of units" [value]="u">{{ u }}</option>
-          </select>
-        </div>
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Protéines (g)</mat-label>
+          <input matInput type="number" formControlName="protein" step="0.1" />
+        </mat-form-field>
       </div>
     </div>
 
-    <div class="form-section">
-      <h3>Informations nutritionnelles (pour 100g)</h3>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="calories">Calories (kcal)</label>
-          <input
-            id="calories"
-            type="number"
-            formControlName="calories"
-            class="form-control"
-            step="0.1"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="protein">Protéines (g)</label>
-          <input
-            id="protein"
-            type="number"
-            formControlName="protein"
-            class="form-control"
-            step="0.1"
-          />
-        </div>
+    <div class="form-row">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Glucides (g)</mat-label>
+          <input matInput type="number" formControlName="carbs" step="0.1" />
+        </mat-form-field>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="carbs">Glucides (g)</label>
-          <input id="carbs" type="number" formControlName="carbs" class="form-control" step="0.1" />
-        </div>
-
-        <div class="form-group">
-          <label for="fats">Lipides (g)</label>
-          <input id="fats" type="number" formControlName="fats" class="form-control" step="0.1" />
-        </div>
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Lipides (g)</mat-label>
+          <input matInput type="number" formControlName="fats" step="0.1" />
+        </mat-form-field>
       </div>
     </div>
+  </div>
+</form>
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-        {{ _ingredient ? 'Modifier' : 'Créer' }} l'ingrédient
-      </button>
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">Annuler</button>
-    </div>
-  </form>
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="!form.valid"
+  >
+    {{ isEditMode ? 'Modifier' : 'Créer' }} l'ingrédient
+  </button>
 </div>

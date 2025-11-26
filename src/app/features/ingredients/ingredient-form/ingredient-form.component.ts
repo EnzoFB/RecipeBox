@@ -29,6 +29,7 @@ export class IngredientFormComponent implements OnInit {
   categories = INGREDIENT_CATEGORIES;
   units = ['g', 'kg', 'ml', 'l', 'c. à soupe', 'c. à café', 'unité'];
   isEditMode = false;
+  imagePreview: string | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -39,6 +40,7 @@ export class IngredientFormComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       category: ['', Validators.required],
       unit: ['g', Validators.required],
+      image: [''],
       calories: [0, [Validators.required, Validators.min(0)]],
       protein: [0, [Validators.required, Validators.min(0)]],
       carbs: [0, [Validators.required, Validators.min(0)]],
@@ -58,11 +60,36 @@ export class IngredientFormComponent implements OnInit {
       name: ingredient.name,
       category: ingredient.category,
       unit: ingredient.unit,
+      image: ingredient.image || '',
       calories: ingredient.calories || 0,
       protein: ingredient.protein || 0,
       carbs: ingredient.carbs || 0,
       fats: ingredient.fats || 0
     });
+    if (ingredient.image) {
+      this.imagePreview = ingredient.image;
+    }
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const base64 = e.target?.result as string;
+        this.form.patchValue({ image: base64 });
+        this.imagePreview = base64;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(): void {
+    this.form.patchValue({ image: '' });
+    this.imagePreview = null;
   }
 
   onSubmit(): void {
@@ -75,6 +102,7 @@ export class IngredientFormComponent implements OnInit {
       name: this.form.get('name')?.value,
       category: this.form.get('category')?.value,
       unit: this.form.get('unit')?.value,
+      image: this.form.get('image')?.value || undefined,
       calories: this.form.get('calories')?.value,
       protein: this.form.get('protein')?.value,
       carbs: this.form.get('carbs')?.value,

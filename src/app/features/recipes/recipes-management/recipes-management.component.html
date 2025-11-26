@@ -25,6 +25,7 @@
       <table class="recipes-table">
         <thead>
           <tr>
+            <th>Image</th>
             <th>Nom</th>
             <th>Catégorie</th>
             <th>Temps</th>
@@ -35,6 +36,15 @@
         <tbody>
           @for (recipe of filteredRecipes; track recipe.id) {
             <tr class="recipe-row">
+              <td class="image-cell">
+                @if (recipe.image) {
+                  <img [src]="recipe.image" [alt]="recipe.name" class="recipe-thumb" />
+                } @else {
+                  <div class="recipe-thumb-placeholder">
+                    <span class="placeholder-icon">📸</span>
+                  </div>
+                }
+              </td>
               <td>{{ recipe.name }}</td>
               <td>
                 <span class="category-badge">{{ recipe.category }}</span>

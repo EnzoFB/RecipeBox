@@ -1,6 +1,6 @@
 <div class="ingredients-container">
   <div class="header">
-    <h1>🥬 Mes Ingrédients</h1>
+    <h1>🥬 Gestion des Ingrédients</h1>
     <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter un ingrédient</button>
   </div>
 
@@ -23,47 +23,59 @@
     </div>
   </div>
 
-  <div class="ingredients-table-container">
+  <div class="ingredients-grid">
     <div *ngIf="filteredIngredients.length === 0" class="empty-state">
       <p>Aucun ingrédient trouvé.</p>
     </div>
 
-    <table class="ingredients-table" *ngIf="filteredIngredients.length > 0">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Catégorie</th>
-          <th>Unité</th>
-          <th>Calories (100g)</th>
-          <th>Protéines</th>
-          <th>Glucides</th>
-          <th>Lipides</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for(ingredient of filteredIngredients; track ingredient.id) {
-          <tr class="ingredient-row">
-            <td class="ingredient-name">{{ ingredient.name }}</td>
-            <td class="ingredient-category">
-              <span class="category-badge">{{ ingredient.category }}</span>
-            </td>
-            <td>{{ ingredient.unit }}</td>
-            <td>{{ ingredient.calories || '-' }} kcal</td>
-            <td>{{ ingredient.protein || '-' }}g</td>
-            <td>{{ ingredient.carbs || '-' }}g</td>
-            <td>{{ ingredient.fats || '-' }}g</td>
-            <td class="actions-cell">
-              <button mat-button (click)="openEditForm(ingredient)">
-                Modifier
-              </button>
-              <button mat-button color="warn" (click)="onDeleteIngredient(ingredient.id!)">
-                Supprimer
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+    @for(ingredient of filteredIngredients; track ingredient.id) {
+      <mat-card class="ingredient-card">
+        <div class="ingredient-image">
+          @if (ingredient.image) {
+            <img [src]="ingredient.image" [alt]="ingredient.name" class="ingredient-photo" />
+          } @else {
+            <div class="ingredient-placeholder">
+              <span class="placeholder-icon">🥕</span>
+            </div>
+          }
+        </div>
+        <mat-card-header>
+          <h3>{{ ingredient.name }}</h3>
+          <span class="category-badge">{{ ingredient.category }}</span>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="ingredient-info">
+            <span class="info-item">
+              <strong>Unité:</strong> {{ ingredient.unit }}
+            </span>
+            <span class="info-item">
+              <strong>Calories (100g):</strong> {{ ingredient.calories || '-' }} kcal
+            </span>
+          </div>
+          <div class="ingredient-nutrition">
+            <div class="nutrition-item">
+              <span class="label">Protéines</span>
+              <span class="value">{{ ingredient.protein || '-' }}g</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="label">Glucides</span>
+              <span class="value">{{ ingredient.carbs || '-' }}g</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="label">Lipides</span>
+              <span class="value">{{ ingredient.fats || '-' }}g</span>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button (click)="openEditForm(ingredient)">
+            Modifier
+          </button>
+          <button mat-button color="warn" (click)="onDeleteIngredient(ingredient.id!)">
+            Supprimer
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
   </div>
 </div>

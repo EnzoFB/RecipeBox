@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { Ingredient, INGREDIENT_CATEGORIES } from '../../core/models';
 import { IngredientService } from '../../core/services';
@@ -10,7 +11,7 @@ import { IngredientService } from '../../core/services';
 @Component({
   selector: 'app-ingredients',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatDialogModule, MatButtonModule, MatCardModule],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })

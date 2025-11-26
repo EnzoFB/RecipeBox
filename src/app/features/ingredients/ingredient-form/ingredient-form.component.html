@@ -42,6 +42,36 @@
   </div>
 
   <div class="form-section">
+    <h3>Image</h3>
+    <div class="image-upload">
+      @if (imagePreview) {
+        <div class="image-preview">
+          <img [src]="imagePreview" alt="Prévisualisation" />
+          <button
+            type="button"
+            mat-stroked-button
+            color="warn"
+            (click)="removeImage()"
+            class="remove-btn"
+          >
+            Supprimer l'image
+          </button>
+        </div>
+      } @else {
+        <label class="upload-label">
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            hidden
+          />
+          <span class="upload-btn">📷 Ajouter une image</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <div class="form-section">
     <h3>Informations nutritionnelles (pour 100g)</h3>
 
     <div class="form-row">

@@ -67,6 +67,59 @@
     gap: 1rem;
   }
 
+  .image-upload {
+    .image-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #eee;
+
+      img {
+        max-width: 200px;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .remove-btn {
+        width: 100%;
+        max-width: 200px;
+      }
+    }
+
+    .upload-label {
+      display: block;
+      cursor: pointer;
+
+      .upload-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #666;
+        transition: all 0.3s;
+        cursor: pointer;
+
+        &:hover {
+          border-color: #0056b3;
+          background: #f0f7ff;
+          color: #0056b3;
+        }
+      }
+    }
+  }
+
   .form-actions {
     display: flex;
     gap: 1rem;

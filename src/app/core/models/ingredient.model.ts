@@ -3,6 +3,7 @@ export interface Ingredient {
   name: string;
   category: string;
   unit: string;
+  image?: string;
   calories?: number;
   protein?: number;
   carbs?: number;

@@ -34,6 +34,7 @@ function createTables(): Promise<void> {
           name TEXT NOT NULL UNIQUE,
           category TEXT DEFAULT 'Autre',
           unit TEXT,
+          image TEXT,
           calories INTEGER,
           protein REAL,
           carbs REAL,
@@ -118,11 +119,26 @@ function createTables(): Promise<void> {
         (err) => {
           // Ignore error if column already exists
           if (err && err.message.includes('duplicate column')) {
-            console.log('Image column already exists');
+            console.log('Image column already exists in recipes');
           } else if (err) {
-            console.error('Error adding image column:', err);
+            console.error('Error adding image column to recipes:', err);
           } else {
-            console.log('Image column added successfully');
+            console.log('Image column added successfully to recipes');
+          }
+        }
+      );
+
+      // Add image column to ingredients if it doesn't exist (migration)
+      db!.run(
+        `ALTER TABLE ingredients ADD COLUMN image TEXT`,
+        (err) => {
+          // Ignore error if column already exists
+          if (err && err.message.includes('duplicate column')) {
+            console.log('Image column already exists in ingredients');
+          } else if (err) {
+            console.error('Error adding image column to ingredients:', err);
+          } else {
+            console.log('Image column added successfully to ingredients');
           }
           resolve();
         }

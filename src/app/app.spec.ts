@@ -14,10 +14,18 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render app title', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, recipe-box');
+    expect(compiled.querySelector('span.app-title')?.textContent).toContain('RecipeBox');
+  });
+
+  it('should have navigation buttons', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const navButtons = compiled.querySelectorAll('button[mat-list-item]');
+    expect(navButtons.length).toBeGreaterThan(0);
   });
 });

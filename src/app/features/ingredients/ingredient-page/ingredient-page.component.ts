@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { Ingredient, INGREDIENT_CATEGORIES, Unit } from '../../../core/models';
 import { IngredientService, UnitService } from '../../../core/services';
 
@@ -20,8 +19,7 @@ import { IngredientService, UnitService } from '../../../core/services';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatIconModule,
-    MatToolbarModule
+    MatIconModule
   ],
   templateUrl: './ingredient-page.component.html',
   styleUrl: './ingredient-page.component.scss'

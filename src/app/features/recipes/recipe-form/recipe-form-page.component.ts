@@ -7,12 +7,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { Recipe, Ingredient, RecipeFormData } from '../../../core/models';
+import { Recipe, Ingredient, RecipeFormData, RECIPE_CATEGORIES, DEFAULT_UNITS } from '../../../core/models';
 import { IngredientService, RecipeService } from '../../../core/services';
 
 @Component({
@@ -28,7 +27,6 @@ import { IngredientService, RecipeService } from '../../../core/services';
     MatSelectModule,
     MatIconModule,
     MatTooltipModule,
-    MatCardModule,
     MatProgressSpinnerModule,
     DragDropModule
   ],
@@ -46,6 +44,10 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
   isLoading = signal(false);
   isEditMode = signal(false);
   newStep = '';
+  
+  // Constants pour les options du formulaire
+  readonly recipeCategories = RECIPE_CATEGORIES;
+  readonly availableUnits = DEFAULT_UNITS.map(u => u.symbol);
 
   private readonly destroy$ = new Subject<void>();
   private recipeId: number | null = null;
@@ -147,27 +149,30 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
   }
 
   addIngredient(): void {
-    const ingredientId = this.form.get('ingredientId')?.value;
-    const quantity = this.form.get('quantity')?.value;
-    const unit = this.form.get('unit')?.value;
-
-    if (!ingredientId || !quantity || !unit) {
-      alert('Veuillez remplir tous les champs d\'ingrédient');
+    if (!this.isIngredientFieldsValid()) {
       return;
     }
 
-    const exists = this.selectedIngredients().some(ing => ing.ingredientId === Number.parseInt(ingredientId));
+    const ingredientId = Number.parseInt(this.form.get('ingredientId')?.value);
+    const quantity = this.form.get('quantity')?.value;
+    const unit = this.form.get('unit')?.value;
+
+    const exists = this.selectedIngredients().some(ing => ing.ingredientId === ingredientId);
     if (exists) {
-      alert('Cet ingrédient est déjà ajouté');
       return;
     }
 
     this.selectedIngredients.update(ingredients => [
       ...ingredients,
-      { ingredientId: Number.parseInt(ingredientId), quantity, unit }
+      { ingredientId, quantity, unit }
     ]);
 
-    this.form.patchValue({ ingredientId: '', quantity: 1, unit: 'g' });
+    // Reset ingredient fields
+    this.form.patchValue({ 
+      ingredientId: '', 
+      quantity: 1, 
+      unit: 'g' 
+    });
   }
 
   removeIngredient(ingredientId: number): void {
@@ -177,10 +182,13 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
   }
 
   addStep(): void {
-    if (this.newStep.trim()) {
-      this.steps.update(steps => [...steps, this.newStep]);
-      this.newStep = '';
+    const trimmedStep = this.newStep.trim();
+    if (!trimmedStep) {
+      return;
     }
+
+    this.steps.update(steps => [...steps, trimmedStep]);
+    this.newStep = '';
   }
 
   removeStep(index: number): void {
@@ -194,8 +202,8 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (!this.form.valid || this.steps().length === 0 || this.selectedIngredients().length === 0) {
-      alert('Veuillez remplir tous les champs requis');
+    if (!this.isFormValid()) {
+      this.showValidationErrors();
       return;
     }
 
@@ -242,5 +250,26 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
 
   canAddStep(): boolean {
     return this.newStep.trim().length > 0;
+  }
+
+  private showValidationErrors(): void {
+    if (!this.form.valid) {
+      Object.keys(this.form.controls).forEach(key => {
+        this.form.get(key)?.markAsTouched();
+      });
+    }
+    
+    if (this.selectedIngredients().length === 0) {
+      console.warn('Aucun ingrédient ajouté');
+    }
+    
+    if (this.steps().length === 0) {
+      console.warn('Aucune étape ajoutée');
+    }
+  }
+
+  hasError(controlName: string, errorType: string): boolean {
+    const control = this.form.get(controlName);
+    return !!(control && control.hasError(errorType) && (control.dirty || control.touched));
   }
 }

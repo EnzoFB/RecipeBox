@@ -1,12 +1,16 @@
-<mat-toolbar color="primary" class="page-toolbar">
-  <button mat-icon-button (click)="onCancel()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-  <h1>{{ isEditMode() ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}</h1>
-</mat-toolbar>
+<div class="ingredient-page">
+  <div class="page-header">
+    <button mat-icon-button class="back-button" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1>{{ isEditMode() ? "Modifier l'ingrédient" : 'Nouvel ingrédient' }}</h1>
+      <p class="subtitle">Remplissez les informations ci-dessous</p>
+    </div>
+  </div>
 
-<div class="container">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ingredient-form">
+  <div class="form-container">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ingredient-form">
     <!-- Informations générales -->
     <div class="form-section">
       <h2>
@@ -125,5 +129,6 @@
         {{ isEditMode() ? 'Modifier' : 'Créer' }} l'ingrédient
       </button>
     </div>
-  </form>
+    </form>
+  </div>
 </div>

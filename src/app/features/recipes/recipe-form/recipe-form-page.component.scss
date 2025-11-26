@@ -1,334 +1,574 @@
 .recipe-form-page {
-  padding: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 0;
+}
 
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 500px;
-  }
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
 
-  .form-card {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
+// ============================================================================
+// Header Section
+// ============================================================================
 
-    .card-header {
-      background: linear-gradient(135deg, #c41c3b 0%, #e63851 100%);
-      color: white;
-      padding: 2rem;
-      border: none;
+.page-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
-      .header-content {
-        margin: 0;
+  .back-button {
+    color: #666;
+    transition: all 0.2s ease;
 
-        h2 {
-          margin: 0 0 0.5rem 0;
-          font-size: 1.75rem;
-          font-weight: 600;
-        }
-
-        .subtitle {
-          margin: 0;
-          opacity: 0.9;
-          font-size: 0.95rem;
-        }
-      }
+    &:hover {
+      background-color: #f5f5f5;
+      color: #007bff;
     }
   }
 
-  mat-card-content {
-    padding: 2rem;
-  }
+  .header-content {
+    flex: 1;
 
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .form-section {
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e0e0e0;
-
-    &:last-of-type {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .section-title {
-      margin: 0 0 1.5rem 0;
-      font-size: 1.1rem;
-      font-weight: 600;
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
       color: #333;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-
-    .full-width {
-      grid-column: 1 / -1;
+      font-weight: 600;
     }
 
-    mat-form-field {
-      width: 100%;
-    }
-  }
-
-  .image-upload-container {
-    display: flex;
-    justify-content: center;
-
-    .image-preview {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .remove-btn {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: rgba(0, 0, 0, 0.6);
-        color: white;
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.8);
-        }
-      }
-    }
-
-    .upload-zone {
-      display: flex;
-      width: 250px;
-      height: 180px;
-      border: 2px dashed #c41c3b;
-      border-radius: 8px;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: #fafafa;
-
-      &:hover {
-        border-color: #e63851;
-        background: #fff5f5;
-      }
-
-      .upload-icon {
-        text-align: center;
-        color: #c41c3b;
-
-        mat-icon {
-          font-size: 3rem;
-          width: 3rem;
-          height: 3rem;
-          margin: 0 auto;
-        }
-
-        p {
-          margin: 0.5rem 0 0 0;
-          font-size: 0.9rem;
-          color: #666;
-        }
-      }
-    }
-  }
-
-  .ingredients-input {
-    display: grid;
-    grid-template-columns: 1fr 120px 120px auto;
-    gap: 1rem;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-
-    button {
-      align-self: center;
-      height: 56px;
-    }
-
-    .flex-1 {
-      width: 100%;
-    }
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-
-      button {
-        width: 100%;
-      }
-    }
-  }
-
-  .ingredients-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding-top: 1rem;
-
-    .ingredient-chip {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #f0f0f0;
-      border-left: 3px solid #c41c3b;
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
+    .subtitle {
+      margin: 0.25rem 0 0 0;
+      color: #666;
       font-size: 0.9rem;
-
-      button {
-        margin-left: 0.25rem;
-      }
     }
   }
+}
 
-  .steps-input {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    align-items: flex-start;
-    margin-bottom: 1rem;
+// ============================================================================
+// Form Container
+// ============================================================================
 
-    button {
-      align-self: flex-start;
-      height: 56px;
+.form-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 2rem 2rem 2rem;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem 1rem 1rem;
+    margin: 1rem auto;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+// ============================================================================
+// Two Column Layout
+// ============================================================================
+
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr 350px;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-column-left,
+.form-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ============================================================================
+// Form Sections
+// ============================================================================
+
+.form-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .section-title {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  &.image-section {
+    position: sticky;
+    top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+
+    &.image-section {
+      position: static;
+    }
+  }
+}
+
+// ============================================================================
+// Form Fields Layout
+// ============================================================================
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================================
+// Image Upload Section
+// ============================================================================
+
+.image-upload-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+
+  .image-preview {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.02);
     }
 
-    .flex-1 {
+    img {
       width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-
-      button {
-        width: 100%;
-      }
-    }
-  }
-
-  .steps-list {
-    padding-top: 1rem;
-
-    .step-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
-      background: #f5f5f5;
-      border-left: 3px solid #c41c3b;
-      margin-bottom: 0.75rem;
-      border-radius: 4px;
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
       transition: all 0.2s ease;
-      cursor: move;
 
       &:hover {
-        background: #ebebeb;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background: rgba(220, 53, 69, 0.9);
+        transform: scale(1.1);
       }
-
-      .drag-handle {
-        color: #999;
-        cursor: grab;
-        margin-top: 0.25rem;
-
-        &:active {
-          cursor: grabbing;
-        }
-      }
-
-      .step-number {
-        font-weight: 600;
-        color: #c41c3b;
-        min-width: 2rem;
-        margin-top: 0.25rem;
-      }
-
-      .step-text {
-        flex: 1;
-        line-height: 1.5;
-        color: #333;
-      }
-
-      button {
-        align-self: flex-start;
-      }
-    }
-
-    // Styles pour le drag & drop
-    .cdk-drag-preview {
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      opacity: 0.9;
-      background: white;
-      border-left: 3px solid #c41c3b;
-      border-radius: 4px;
-    }
-
-    .cdk-drag-placeholder {
-      opacity: 0.4;
-      background: #e0e0e0;
-    }
-
-    .cdk-drag-animating {
-      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
-
-    .cdk-drop-list-dragging .step-item:not(.cdk-drag-placeholder) {
-      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
   }
 
-  .empty-message {
-    margin: 1rem 0 0 0;
-    padding: 1rem;
-    text-align: center;
-    color: #999;
-    font-style: italic;
-    background: #f9f9f9;
+  .upload-zone {
+    display: flex;
+    width: 100%;
+    height: 280px;
+    border: 2px dashed #007bff;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+
+    &:hover {
+      border-color: #0056b3;
+      background: #e7f3ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    .upload-icon {
+      text-align: center;
+      color: #007bff;
+
+      mat-icon {
+        font-size: 3.5rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        margin: 0 auto;
+        transition: transform 0.2s ease;
+      }
+
+      p {
+        margin: 0.75rem 0 0 0;
+        font-size: 0.95rem;
+        color: #666;
+        font-weight: 500;
+      }
+    }
+
+    &:hover .upload-icon mat-icon {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// ============================================================================
+// Ingredients Section
+// ============================================================================
+
+.ingredients-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .quantity-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .add-btn {
+    height: 56px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    mat-icon {
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .add-btn {
+      width: 100%;
+      height: 48px;
+    }
+  }
+}
+
+.ingredients-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  min-height: 60px;
+
+  .ingredient-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-left: 3px solid #007bff;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      border-left-color: #0056b3;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    span {
+      color: #333;
+      font-weight: 500;
+    }
+
+    button {
+      margin-left: 0.25rem;
+      color: #666;
+      
+      &:hover {
+        color: #dc3545;
+        background-color: #fee;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// Steps Section
+// ============================================================================
+
+.steps-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .add-step-btn {
+    height: 48px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .add-step-btn {
+      width: 100%;
+    }
+  }
+}
+
+.steps-list {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  min-height: 80px;
+  max-height: 600px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
     border-radius: 4px;
   }
 
-  .form-actions {
+  &::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 4px;
+
+    &:hover {
+      background: #a0a0a0;
+    }
+  }
+
+  .step-item {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    padding-top: 1rem;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 1rem;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-left: 3px solid #007bff;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: move;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
-    button {
-      min-width: 140px;
-      height: 44px;
-      font-weight: 500;
+    &:last-child {
+      margin-bottom: 0;
+    }
 
-      mat-icon {
-        margin-right: 0.5rem;
+    &:hover {
+      border-left-color: #0056b3;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+      transform: translateX(2px);
+    }
+
+    .drag-handle {
+      color: #999;
+      cursor: grab;
+      margin-top: 0.15rem;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: #007bff;
+      }
+
+      &:active {
+        cursor: grabbing;
+        color: #0056b3;
       }
     }
 
-    @media (max-width: 768px) {
-      flex-direction: column-reverse;
+    .step-number {
+      font-weight: 700;
+      color: #007bff;
+      min-width: 2rem;
+      margin-top: 0.15rem;
+      font-size: 1rem;
+    }
 
-      button {
-        width: 100%;
-        min-width: unset;
+    .step-text {
+      flex: 1;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    button {
+      align-self: flex-start;
+      color: #666;
+      
+      &:hover {
+        color: #dc3545;
+        background-color: #fee;
       }
+    }
+  }
+
+  // Drag & Drop Styles
+  .cdk-drag-preview {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    opacity: 0.95;
+    background: white;
+    border-left: 3px solid #007bff;
+    border-radius: 6px;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0.3;
+    background: #e0e0e0;
+    border: 2px dashed #999;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .cdk-drop-list-dragging .step-item:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+// ============================================================================
+// Empty State
+// ============================================================================
+
+.empty-message {
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #ddd;
+  font-size: 0.95rem;
+}
+
+// ============================================================================
+// Form Actions
+// ============================================================================
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem;
+  background: white;
+  border-top: 2px solid #f0f0f0;
+  margin: 2rem -2rem 0 -2rem;
+  border-radius: 0 0 12px 12px;
+
+  button {
+    min-width: 140px;
+    height: 48px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &[mat-stroked-button] {
+      &:hover {
+        background-color: #f8f9fa;
+        border-color: #999;
+      }
+    }
+
+    &[mat-raised-button]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    padding: 1rem;
+    margin: 1.5rem -1.5rem 0 -1.5rem;
+
+    button {
+      width: 100%;
+      min-width: unset;
     }
   }
 }

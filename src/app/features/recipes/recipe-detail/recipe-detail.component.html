@@ -121,7 +121,12 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="makeRecipe()" [disabled]="overallStatus === '🔴' && missingIngredientsCount === recipe.ingredients.length">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="makeRecipe()" 
+          [disabled]="overallStatus === '🔴' && missingIngredientsCount === recipe.ingredients.length"
+        >
           <mat-icon>check_circle</mat-icon>
           Réaliser la recette ({{ portions }} portion{{ portions > 1 ? 's' : '' }})
         </button>

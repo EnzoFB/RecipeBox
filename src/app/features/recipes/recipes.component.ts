@@ -8,9 +8,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { Recipe, DifficultyLevel, DIFFICULTY_LABELS } from '../../core/models';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
+import { Recipe } from '../../core/models';
 import { RecipeService, IngredientService } from '../../core/services';
 import { IngredientStockService } from '../../core/services/ingredient-stock.service';
+import { ShoppingListService } from '../../core/services/shopping-list.service';
+import { ShoppingListItem } from '../../core/models/shopping-list.model';
+import { CartModalComponent } from './cart-modal/cart-modal.component';
 
 // Pipes
 @Pipe({
@@ -65,6 +70,7 @@ interface RecipeWithStatus extends Recipe {
     MatFormFieldModule,
     MatCardModule,
     MatChipsModule,
+    MatSelectModule,
     FilterByStatusPipe,
     SliceByExpiryPipe
   ],
@@ -80,6 +86,8 @@ export class RecipesComponent implements OnInit {
     private readonly recipeService: RecipeService,
     private readonly stockService: IngredientStockService,
     private readonly ingredientService: IngredientService,
+    private readonly shoppingListService: ShoppingListService,
+    private readonly dialog: MatDialog,
     private readonly router: Router
   ) {}
 
@@ -192,6 +200,44 @@ export class RecipesComponent implements OnInit {
       5: 'Très difficile'
     };
     return labels[difficulty] || 'Moyen';
+  }
+
+  openCartModal(recipe: RecipeWithStatus): void {
+    const dialogRef = this.dialog.open(CartModalComponent, {
+      width: '500px',
+      data: {
+        recipeName: recipe.name,
+        missingIngredients: recipe.missingIngredients || []
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(portions => {
+      if (portions) {
+        this.addToShoppingList(recipe, portions);
+      }
+    });
+  }
+
+  private addToShoppingList(recipe: RecipeWithStatus, portions: number): void {
+    if (!recipe.missingIngredients || recipe.missingIngredients.length === 0) {
+      alert('Aucun ingrédient manquant à ajouter');
+      return;
+    }
+
+    const itemsToAdd: Array<Omit<ShoppingListItem, 'id' | 'createdAt'>> = [];
+    for (const missing of recipe.missingIngredients) {
+      const quantityNeeded = missing.missing * portions;
+      itemsToAdd.push({
+        ingredientId: missing.ingredientId,
+        quantityNeeded,
+        unit: missing.unit,
+        sourceRecipeId: recipe.id,
+        sourceRecipeName: recipe.name
+      });
+    }
+
+    this.shoppingListService.addBulkItems(itemsToAdd);
+    alert(`${recipe.missingIngredients.length} ingrédient(s) ajouté(s) à la liste de courses`);
   }
 }
 

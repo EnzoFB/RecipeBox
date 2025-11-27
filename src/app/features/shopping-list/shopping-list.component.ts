@@ -72,25 +72,27 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   private loadShoppingList(): void {
-    this.shoppingListService.getShoppingList()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(items => {
-        this.totalItems = items.length;
-        this.loadWithDetails();
-      });
-  }
-
-  private loadWithDetails(): void {
     this.shoppingListService.getShoppingListWithDetails()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(items => {
-        this.shoppingList = items.map(item => ({
-          ...item,
-          mode: 'edit',
-          boughtQuantity: item.quantityNeeded,
-          expiryDateForBought: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-        }));
-        this.dataSource.data = this.shoppingList;
+      .subscribe({
+        next: (items) => {
+          console.log('Shopping list loaded:', items);
+          this.totalItems = items.length;
+          this.shoppingList = items.map(item => ({
+            ...item,
+            mode: 'edit',
+            boughtQuantity: item.quantityNeeded,
+            expiryDateForBought: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+          }));
+          this.dataSource.data = this.shoppingList;
+          console.log('Data source updated:', this.dataSource.data);
+        },
+        error: (err) => {
+          console.error('Error loading shopping list:', err);
+          this.totalItems = 0;
+          this.shoppingList = [];
+          this.dataSource.data = [];
+        }
       });
   }
 

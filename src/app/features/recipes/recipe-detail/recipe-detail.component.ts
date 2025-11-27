@@ -9,11 +9,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 
 import { Recipe, ShoppingListItem } from '../../../core/models';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { IngredientStockService } from '../../../core/services/ingredient-stock.service';
 import { ShoppingListService } from '../../../core/services/shopping-list.service';
+import { MissingIngredientsModalComponent } from './missing-ingredients-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -61,7 +63,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly recipeService: RecipeService,
     private readonly stockService: IngredientStockService,
-    private readonly shoppingListService: ShoppingListService
+    private readonly shoppingListService: ShoppingListService,
+    private readonly dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -116,9 +119,16 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
       const available = this.stockService.getTotalQuantityInStock(ing.ingredientId, ing.unit);
       const missing = Math.max(0, scaled - available);
       
-      let status: AvailabilityStatus = '✅';
-      if (available < scaled) {
-        status = missing > 0 ? '🟡' : '🔴';
+      let status: AvailabilityStatus;
+      if (available >= scaled) {
+        // Assez d'ingrédient
+        status = '✅';
+      } else if (available > 0) {
+        // Partiellement disponible
+        status = '🟡';
+      } else {
+        // Pas d'ingrédient du tout
+        status = '🔴';
       }
 
       return {
@@ -173,20 +183,36 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   makeRecipe(): void {
     if (!this.recipe) return;
 
-    // Check availability
-    if (this.overallStatus === '🔴') {
-      const response = confirm(
-        `Attention: Il vous manque des ingrédients pour cette recette.\n\n` +
-        `Voulez-vous:\n` +
-        `- OK: Ajouter les manquants à la liste de courses et annuler\n` +
-        `- Annuler: Continuer malgré tout (déduire ce qui est disponible)`
-      );
+    // If there are missing ingredients, show modal
+    if (this.missingIngredientsCount > 0) {
+      const missingData = this.ingredientsWithStock
+        .filter(ing => ing.missing > 0)
+        .map(ing => ({
+          ingredientName: ing.ingredientName,
+          missing: ing.missing,
+          unit: ing.unit
+        }));
 
-      if (response) {
-        this.addAllMissingToShoppingList();
-        return;
-      }
+      const dialogRef = this.dialog.open(MissingIngredientsModalComponent, {
+        width: '500px',
+        data: missingData
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'add-to-shopping-list') {
+          this.addAllMissingToShoppingList();
+        } else if (result === 'continue-anyway') {
+          this.executeRecipe();
+        }
+      });
+    } else {
+      // All ingredients available, execute recipe directly
+      this.executeRecipe();
     }
+  }
+
+  private executeRecipe(): void {
+    if (!this.recipe) return;
 
     // Deduct from stock
     const scaledIngredients = this.recipe.ingredients.map(ing => ({

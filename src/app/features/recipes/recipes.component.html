@@ -85,7 +85,7 @@
                 }
               </mat-card-content>
 
-              <!-- Recipe Actions -->
+              <!-- Recipe Actions --> 
               <mat-card-actions>
                 <button mat-raised-button color="primary" (click)="viewRecipe(recipe)">
                   <mat-icon>visibility</mat-icon>
@@ -162,9 +162,9 @@
 
               <!-- Recipe Actions (Disabled) -->
               <mat-card-actions>
-                <button mat-raised-button color="primary" (click)="viewRecipe(recipe)" disabled>
-                  <mat-icon>visibility</mat-icon>
-                  Voir la recette
+                <button mat-raised-button color="accent" (click)="openCartModal(recipe)">
+                  <mat-icon>shopping_cart</mat-icon>
+                  Ajouter les ingrédients
                 </button>
               </mat-card-actions>
             </mat-card>

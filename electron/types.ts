@@ -65,12 +65,6 @@ export interface IngredientStock {
 // Request/Response Types
 // ============================================================================
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
 export interface IPCHandlers {
   // Recipe handlers
   'recipes:getAll': () => Promise<Recipe[]>;

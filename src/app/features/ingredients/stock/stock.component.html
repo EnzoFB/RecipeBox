@@ -38,6 +38,16 @@
 
           <!-- Card Body -->
           <div class="card-body">
+            <div class="ingredient-image">
+              @if (getIngredientImage(item.ingredientId); as image) {
+                <img [src]="image" [alt]="getIngredientName(item.ingredientId)" />
+              } @else {
+                <div class="no-image">
+                  <mat-icon>image_not_supported</mat-icon>
+                </div>
+              }
+            </div>
+
             <div class="quantity-section">
               <div class="quantity-value">{{ item.quantity }}</div>
               <div class="quantity-unit">{{ item.unit }}</div>
@@ -66,6 +76,9 @@
 
           <!-- Card Actions -->
           <div class="card-actions">
+            <button mat-icon-button matTooltip="Dupliquer" (click)="onDuplicateStock(item)">
+              <mat-icon>content_copy</mat-icon>
+            </button>
             <button mat-icon-button matTooltip="Modifier" (click)="openEditForm(item)">
               <mat-icon>edit</mat-icon>
             </button>

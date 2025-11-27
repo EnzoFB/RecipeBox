@@ -32,17 +32,17 @@
         <div class="portions-section">
           <h3>Portions</h3>
           <div class="portions-input">
-            <button mat-icon-button (click)="portions = Math.max(1, portions - 1)">
+            <button mat-icon-button (click)="portions = Math.max(1, portions - 1); onPortionsChange()">
               <mat-icon>remove</mat-icon>
             </button>
             <input
               type="number"
               min="1"
               [(ngModel)]="portions"
-              (change)="onPortionsChange()"
+              (input)="onPortionsChange()"
               class="portions-input-field"
             />
-            <button mat-icon-button (click)="portions = portions + 1">
+            <button mat-icon-button (click)="portions = portions + 1; onPortionsChange()">
               <mat-icon>add</mat-icon>
             </button>
           </div>

@@ -32,7 +32,7 @@ export class StockComponent implements OnInit {
     private readonly stockService: IngredientStockService,
     private readonly ingredientService: IngredientService,
     private readonly dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Load stock
@@ -63,7 +63,7 @@ export class StockComponent implements OnInit {
       width: '500px',
       data: { item, ingredients: this.availableIngredients() }
     });
-    
+
     this.currentDialog.afterClosed().subscribe((result: any) => {
       this.currentDialog = null;
       if (result) {
@@ -75,18 +75,34 @@ export class StockComponent implements OnInit {
 
   onDeleteStock(id: number | undefined): void {
     if (!id || !confirm('Êtes-vous sûr de vouloir supprimer ce stock ?')) return;
-    
+
     // Close the edit dialog if it's open
     if (this.currentDialog) {
       this.currentDialog.close();
       this.currentDialog = null;
     }
-    
+
     this.stockService.deleteStock(id);
+  }
+
+  onDuplicateStock(item: IngredientStock): void {
+    const duplicatedItem = {
+      ingredientId: item.ingredientId,
+      quantity: item.quantity,
+      unit: item.unit,
+      expiryDate: item.expiryDate
+    };
+
+    this.stockService.addStock(duplicatedItem);
+    this.stock.set(this.stockService.getStockWithExpiry());
   }
 
   getIngredientName(ingredientId: number): string {
     return this.availableIngredients().find(i => i.id === ingredientId)?.name || 'Ingrédient supprimé';
+  }
+
+  getIngredientImage(ingredientId: number): string | undefined {
+    return this.availableIngredients().find(i => i.id === ingredientId)?.image;
   }
 
   getExpiryStatus(item: StockWithDaysToExpiry): string {

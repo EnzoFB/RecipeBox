@@ -1,5 +1,28 @@
+// ============================================================================
+// SCSS Variables - Design tokens for consistent styling
+// ============================================================================
+
+$primary-color: #1967d2;
+$primary-hover: rgba(25, 103, 210, 0.12);
+$sidenav-width: 260px;
+$toolbar-height: 64px;
+$transition-duration: 0.3s;
+$text-primary: #333;
+$text-secondary: #666;
+$text-disabled: #999;
+$bg-light: #fafafa;
+$bg-white: #ffffff;
+$border-radius: 4px;
+$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+$separator-margin: 4px;
+$list-item-height: 48px;
+
+// ============================================================================
+// Toolbar
+// ============================================================================
+
 .app-toolbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: $box-shadow;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -14,14 +37,22 @@
   }
 }
 
+// ============================================================================
+// Container Layout
+// ============================================================================
+
 .app-container {
-  height: calc(100vh - 64px);
+  height: calc(100vh - $toolbar-height);
   display: flex;
 }
 
+// ============================================================================
+// Sidebar Navigation
+// ============================================================================
+
 .sidenav {
-  width: 260px;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  width: $sidenav-width;
+  background: linear-gradient(135deg, $bg-white 0%, $bg-light 100%);
 
   ::ng-deep {
     .mat-mdc-list-base {
@@ -29,12 +60,11 @@
     }
 
     button[mat-list-item] {
-      height: 48px;
-      // padding: 0 16px;
-      margin: 4px 0;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      color: #666;
+      height: $list-item-height;
+      margin: $separator-margin 0;
+      border-radius: $border-radius;
+      transition: all $transition-duration ease;
+      color: $text-secondary;
       font-weight: 500;
       border: none;
 
@@ -43,17 +73,17 @@
       }
 
       &.active {
-        background-color: rgba(25, 103, 210, 0.12);
-        color: #1967d2;
+        background-color: $primary-hover;
+        color: $primary-color;
 
         .mat-icon {
-          color: #1967d2;
+          color: $primary-color;
         }
       }
 
       .mat-icon {
         margin: 24px;
-        color: #999;
+        color: $text-disabled;
       }
 
       span {
@@ -63,16 +93,24 @@
   }
 }
 
+// ============================================================================
+// Main Content Area
+// ============================================================================
+
 .main-content {
   flex: 1;
   overflow-y: auto;
-  background-color: #fafafa;
+  background-color: $bg-light;
   padding: 2rem;
 
   @media (max-width: 768px) {
     padding: 1rem;
   }
 }
+
+// ============================================================================
+// Responsive Design
+// ============================================================================
 
 @media (max-width: 768px) {
   .app-container {

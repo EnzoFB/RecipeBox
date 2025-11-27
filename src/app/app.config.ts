@@ -1,22 +1,28 @@
 import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
-import { appRoutes } from './app.routes';
-import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { appRoutes } from './app.routes';
 
+/**
+ * Application configuration with all providers and settings
+ * Includes routing, HTTP, animations, and Material components
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Error handling
     provideBrowserGlobalErrorListeners(),
+    // HTTP client
     provideHttpClient(),
+    // Routing with preloading strategy
     provideRouter(appRoutes, withPreloading(PreloadAllModules)),
-    provideAnimations(), // Note: Keep using this until Angular v23 provides official replacement
-    importProvidersFrom(
-      MatDatepickerModule,
-      MatNativeDateModule
-    ),
-    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' } // optionnel mais pratique
-
+    // Animations
+    provideAnimations(),
+    // Material components
+    importProvidersFrom(MatDatepickerModule, MatNativeDateModule),
+    // Localization
+    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' }
   ]
 };

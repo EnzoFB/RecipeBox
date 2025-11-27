@@ -41,10 +41,10 @@ const loadShoppingList = () =>
   );
 
 // ============================================================================
-// Recipe Routes
+// Recipe Routes - Child routes for recipe feature
 // ============================================================================
 
-const recipeRoutes: Routes = [
+const RECIPE_CHILDREN: Routes = [
   {
     path: 'manage',
     loadComponent: loadRecipesManagement,
@@ -73,10 +73,10 @@ const recipeRoutes: Routes = [
 ];
 
 // ============================================================================
-// Ingredient Routes
+// Ingredient Routes - Child routes for ingredient feature
 // ============================================================================
 
-const ingredientRoutes: Routes = [
+const INGREDIENT_CHILDREN: Routes = [
   {
     path: 'create',
     loadComponent: loadIngredientPage,
@@ -95,7 +95,7 @@ const ingredientRoutes: Routes = [
 ];
 
 // ============================================================================
-// Main Routes
+// Main Application Routes
 // ============================================================================
 
 export const appRoutes: Routes = [
@@ -106,11 +106,11 @@ export const appRoutes: Routes = [
   },
   {
     path: 'recipes',
-    children: recipeRoutes
+    children: RECIPE_CHILDREN
   },
   {
     path: 'ingredients',
-    children: ingredientRoutes
+    children: INGREDIENT_CHILDREN
   },
   {
     path: 'stock',

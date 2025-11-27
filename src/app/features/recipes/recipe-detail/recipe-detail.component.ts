@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Recipe, ShoppingListItem } from '../../../core/models';
 import { RecipeService } from '../../../core/services/recipe.service';
 import { IngredientStockService } from '../../../core/services/ingredient-stock.service';
+import { IngredientService } from '../../../core/services/ingredient.service';
 import { ShoppingListService } from '../../../core/services/shopping-list.service';
 import { MissingIngredientsModalComponent } from './missing-ingredients-modal.component';
 import { Subject } from 'rxjs';
@@ -57,17 +58,30 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   missingIngredientsCount = 0;
 
   private readonly destroy$ = new Subject<void>();
+  private readonly ingredientNameCache = new Map<number, string>();
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly recipeService: RecipeService,
     private readonly stockService: IngredientStockService,
+    private readonly ingredientService: IngredientService,
     private readonly shoppingListService: ShoppingListService,
     private readonly dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    // Load all ingredient names into cache
+    this.ingredientService.getIngredients()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(ingredients => {
+        for (const ing of ingredients) {
+          if (ing.id !== undefined) {
+            this.ingredientNameCache.set(ing.id, ing.name);
+          }
+        }
+      });
+
     this.route.paramMap
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
@@ -146,8 +160,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   private getIngredientNameById(id: number): string {
-    // Placeholder - ideally fetch from cache or service
-    return `Ingredient ${id}`;
+    return this.ingredientNameCache.get(id) || `Ingrédient ${id}`;
   }
 
   addMissingToShoppingList(ingredient: IngredientWithStock): void {

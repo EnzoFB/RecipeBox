@@ -24,7 +24,9 @@
   <div class="form-group">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Date d'expiration *</mat-label>
-      <input matInput type="date" formControlName="expiryDate" />
+      <input matInput [matDatepicker]="datePicker" formControlName="expiryDate" readonly />
+      <mat-datepicker-toggle [for]="datePicker" matIconSuffix></mat-datepicker-toggle>
+      <mat-datepicker #datePicker></mat-datepicker>
     </mat-form-field>
   </div>
 </form>

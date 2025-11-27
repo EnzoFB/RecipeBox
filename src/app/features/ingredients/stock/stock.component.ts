@@ -5,6 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 import { IngredientStock, StockWithDaysToExpiry, Ingredient } from '../../../core/models';
 import { IngredientStockService } from '../../../core/services/ingredient-stock.service';
 import { IngredientService } from '../../../core/services/ingredient.service';
@@ -18,7 +22,11 @@ import { StockFormDialogComponent } from './stock-form-dialog/stock-form-dialog.
     MatIconModule,
     MatCardModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatButtonToggleModule,
+    MatTabsModule,
+    MatTableModule,
+    MatSortModule
   ],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.scss'
@@ -26,6 +34,8 @@ import { StockFormDialogComponent } from './stock-form-dialog/stock-form-dialog.
 export class StockComponent implements OnInit {
   stock = signal<StockWithDaysToExpiry[]>([]);
   availableIngredients = signal<Ingredient[]>([]);
+  viewMode = signal<'cards' | 'table'>('cards');
+  displayedColumns = ['image', 'name', 'category', 'quantity', 'expiry', 'status', 'actions'];
   private currentDialog: any = null;
 
   constructor(
@@ -116,5 +126,18 @@ export class StockComponent implements OnInit {
     if (item.isExpired) return 'expired';
     if (item.daysToExpiry < 3) return 'expiring-soon';
     return '';
+  }
+
+  onViewModeChange(event: any): void {
+    this.viewMode.set(event.value);
+  }
+
+  getCategoriesFromStock(): string[] {
+    const categories = new Set(this.stock().map(item => item.category).filter((cat): cat is string => !!cat));
+    return Array.from(categories).sort((a, b) => a.localeCompare(b));
+  }
+
+  getItemsByCategory(category: string): StockWithDaysToExpiry[] {
+    return this.stock().filter(item => item.category === category);
   }
 }

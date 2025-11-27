@@ -6,6 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 import { IngredientStock, Ingredient } from '../../../../core/models';
 import { UnitService } from '../../../../core/services';
 
@@ -16,11 +19,14 @@ import { UnitService } from '../../../../core/services';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatIconModule
   ],
   templateUrl: './stock-form-dialog.component.html',
   styleUrl: './stock-form-dialog.component.scss'
@@ -61,10 +67,12 @@ export class StockFormDialogComponent implements OnInit {
       }
 
       this.isEditMode = true;
+      // Convert string date to Date object for datepicker
+      const expiryDate = new Date(this.data.item.expiryDate + 'T00:00:00');
       this.form.patchValue({
         ingredientId: this.data.item.ingredientId,
         quantity: this.data.item.quantity,
-        expiryDate: this.data.item.expiryDate
+        expiryDate: expiryDate
       });
       this.onIngredientSelected();
     }
@@ -95,11 +103,24 @@ export class StockFormDialogComponent implements OnInit {
       ? (this.unitsMap.get(this.selectedIngredient.unitId) || '')
       : '';
 
+    // Convert Date to string YYYY-MM-DD format
+    const expiryDateValue = this.form.get('expiryDate')?.value;
+    let expiryDateString = '';
+    
+    if (expiryDateValue instanceof Date) {
+      const year = expiryDateValue.getFullYear();
+      const month = String(expiryDateValue.getMonth() + 1).padStart(2, '0');
+      const day = String(expiryDateValue.getDate()).padStart(2, '0');
+      expiryDateString = `${year}-${month}-${day}`;
+    } else if (typeof expiryDateValue === 'string') {
+      expiryDateString = expiryDateValue;
+    }
+
     const formData = {
       ingredientId: this.form.get('ingredientId')?.value,
       quantity: this.form.get('quantity')?.value,
       unit: unitSymbol,
-      expiryDate: this.form.get('expiryDate')?.value
+      expiryDate: expiryDateString
     };
 
     this.dialogRef.close(formData);

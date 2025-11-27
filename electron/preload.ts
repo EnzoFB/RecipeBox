@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+// ============================================================================
+// Expose IPC Methods to Renderer
+// ============================================================================
+
 contextBridge.exposeInMainWorld('electronAPI', {
   // Recipe APIs
   recipes: {

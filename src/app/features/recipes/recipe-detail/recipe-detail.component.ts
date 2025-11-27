@@ -240,7 +240,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/recipes/manage']);
+    this.router.navigate(['/recipes']);
   }
 
   getStatusIcon(status: string): string {

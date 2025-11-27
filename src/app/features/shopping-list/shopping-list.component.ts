@@ -96,12 +96,6 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
       });
   }
 
-  toggleBuyMode(): void {
-    this.isBuyMode = !this.isBuyMode;
-    // Both modes show all items, just different table columns
-    this.dataSource.data = this.shoppingList;
-  }
-
   deleteItem(id: number): void {
     if (confirm('Supprimer cet ingrédient de la liste ?')) {
       this.shoppingListService.deleteItem(id);
@@ -138,10 +132,35 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   addAllToStock(): void {
-    for (const item of this.shoppingList.filter(i => i.mode === 'buy')) {
+    let addedCount = 0;
+    const itemsToAdd = [...this.shoppingList]; // Create a copy to avoid issues during iteration
+
+    for (const item of itemsToAdd) {
       if (item.boughtQuantity && item.expiryDateForBought) {
-        this.addItemToStock(item);
+        // Add to stock
+        const stockItem = {
+          ingredientId: item.ingredientId,
+          quantity: item.boughtQuantity,
+          unit: item.unit,
+          expiryDate: item.expiryDateForBought
+        };
+
+        this.stockService.addStock(stockItem);
+
+        // Remove from shopping list
+        if (item.id) {
+          this.shoppingListService.deleteItem(item.id);
+        }
+        
+        addedCount++;
       }
+    }
+
+    if (addedCount > 0) {
+      alert(`✅ ${addedCount} article(s) ajouté(s) au stock!`);
+      this.router.navigate(['/ingredients/stock']);
+    } else {
+      alert('⚠️ Veuillez remplir les quantités et dates de péremption pour tous les articles');
     }
   }
 

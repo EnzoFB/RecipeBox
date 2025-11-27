@@ -14,6 +14,18 @@ const stockService = new StockService();
 const shoppingListService = new ShoppingListService();
 
 // ============================================================================
+// Register All Handlers
+// ============================================================================
+
+export function registerAllHandlers(): void {
+  registerRecipeHandlers();
+  registerIngredientHandlers();
+  registerStockHandlers();
+  registerShoppingListHandlers();
+  logger.success('All IPC handlers registered');
+}
+
+// ============================================================================
 // Error Handler Wrapper
 // ============================================================================
 
@@ -28,7 +40,7 @@ function handleIpcError(channel: string, error: any, reject?: (reason?: any) => 
 // Recipe Handlers
 // ============================================================================
 
-export function registerRecipeHandlers(): void {
+function registerRecipeHandlers(): void {
   ipcMain.handle('recipes:getAll', async (_event: IpcMainInvokeEvent) => {
     try {
       logger.debug('IPC: recipes:getAll');
@@ -86,7 +98,7 @@ export function registerRecipeHandlers(): void {
 // Ingredient Handlers
 // ============================================================================
 
-export function registerIngredientHandlers(): void {
+function registerIngredientHandlers(): void {
   ipcMain.handle('ingredients:getAll', async (_event: IpcMainInvokeEvent) => {
     try {
       logger.debug('IPC: ingredients:getAll');
@@ -134,7 +146,7 @@ export function registerIngredientHandlers(): void {
 // Stock Handlers
 // ============================================================================
 
-export function registerStockHandlers(): void {
+function registerStockHandlers(): void {
   ipcMain.handle('stock:getAll', async (_event: IpcMainInvokeEvent) => {
     try {
       logger.debug('IPC: stock:getAll');
@@ -192,7 +204,7 @@ export function registerStockHandlers(): void {
 // Shopping List Handlers
 // ============================================================================
 
-export function registerShoppingListHandlers(): void {
+function registerShoppingListHandlers(): void {
   ipcMain.handle('shoppingList:getAll', async (_event: IpcMainInvokeEvent) => {
     try {
       logger.debug('IPC: shoppingList:getAll');
@@ -284,16 +296,4 @@ export function registerShoppingListHandlers(): void {
   });
 
   logger.info('✓ Shopping List IPC handlers registered');
-}
-
-// ============================================================================
-// Register All Handlers
-// ============================================================================
-
-export function registerAllHandlers(): void {
-  registerRecipeHandlers();
-  registerIngredientHandlers();
-  registerStockHandlers();
-  registerShoppingListHandlers();
-  logger.success('All IPC handlers registered');
 }

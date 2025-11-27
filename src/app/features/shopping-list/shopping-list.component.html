@@ -74,13 +74,6 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
-
-          <div class="tab-actions">
-            <button mat-raised-button color="primary" (click)="toggleBuyMode()">
-              <mat-icon>shopping_cart</mat-icon>
-              Passer au mode achat
-            </button>
-          </div>
         </div>
       </mat-tab>
 
@@ -156,10 +149,6 @@
             <button mat-raised-button color="primary" (click)="addAllToStock()">
               <mat-icon>check_circle</mat-icon>
               Ajouter tous au stock
-            </button>
-            <button mat-button (click)="toggleBuyMode()">
-              <mat-icon>close</mat-icon>
-              Retour
             </button>
           </div>
         </div>

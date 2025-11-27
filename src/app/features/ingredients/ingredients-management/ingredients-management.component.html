@@ -3,6 +3,13 @@
   <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter un ingrédient</button>
 </div>
 
+@if (error()) {
+  <div class="error-message">
+    <mat-icon>error</mat-icon>
+    <span>{{ error() }}</span>
+  </div>
+}
+
 <div class="search-section">
   <input
     type="text"
@@ -11,66 +18,83 @@
     [(ngModel)]="searchQuery"
     (input)="onSearch()"
   />
-  <span class="ingredient-count">{{ filteredIngredients.length }} ingrédient(s)</span>
+  <span class="ingredient-count">{{ dataSource.data.length }} ingrédient(s)</span>
 </div>
 
 <div class="ingredients-table-container">
-  @if (filteredIngredients.length === 0) {
+  @if (dataSource.data.length === 0) {
     <div class="empty-state">
       <p>🥘 Aucun ingrédient trouvé.</p>
       <small>Commencez par en ajouter un !</small>
     </div>
   } @else {
-    <table class="ingredients-table">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Nom</th>
-          <th>Catégorie</th>
-          <th>Unité</th>
-          <th>Calories</th>
-          <th class="actions-header">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (ingredient of filteredIngredients; track ingredient.id) {
-          <tr class="ingredient-row">
-            <td class="image-cell">
-              @if (ingredient.image) {
-                <img [src]="ingredient.image" [alt]="ingredient.name" class="ingredient-thumb" />
-              } @else {
-                <div class="ingredient-thumb-placeholder">
-                  <span class="placeholder-icon">🥕</span>
-                </div>
-              }
-            </td>
-            <td>{{ ingredient.name }}</td>
-            <td>
-              <span class="category-badge">{{ ingredient.category }}</span>
-            </td>
-            <td>{{ getUnitName(ingredient.unitId) }}</td>
-            <td>{{ ingredient.calories || '-' }} kcal</td>
-            <td class="actions-cell">
-              <button
-                mat-icon-button
-                matTooltip="Modifier"
-                (click)="openEditForm(ingredient)"
-                class="edit-btn"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                matTooltip="Supprimer"
-                (click)="onDeleteIngredient(ingredient.id!)"
-                class="delete-btn"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
+    <table mat-table [dataSource]="dataSource" matSort class="ingredients-table">
+      <!-- Image Column -->
+      <ng-container matColumnDef="image">
+        <th mat-header-cell *matHeaderCellDef>Image</th>
+        <td mat-cell *matCellDef="let ingredient" class="image-cell">
+          @if (ingredient.image) {
+            <img [src]="ingredient.image" [alt]="ingredient.name" class="ingredient-thumb" />
+          } @else {
+            <div class="ingredient-thumb-placeholder">
+              <span class="placeholder-icon">🥕</span>
+            </div>
+          }
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+        <td mat-cell *matCellDef="let ingredient">{{ ingredient.name }}</td>
+      </ng-container>
+
+      <!-- Category Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
+        <td mat-cell *matCellDef="let ingredient">
+          <span class="category-badge">{{ ingredient.category }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Unit Column -->
+      <ng-container matColumnDef="unit">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Unité</th>
+        <td mat-cell *matCellDef="let ingredient">{{ getUnitName(ingredient.unitId) }}</td>
+      </ng-container>
+
+      <!-- Calories Column -->
+      <ng-container matColumnDef="calories">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Calories</th>
+        <td mat-cell *matCellDef="let ingredient">{{ ingredient.calories || '-' }} kcal</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let ingredient" class="actions-cell">
+          <button
+            mat-icon-button
+            matTooltip="Modifier"
+            (click)="openEditForm(ingredient)"
+            class="edit-btn"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matTooltip="Supprimer"
+            (click)="onDeleteIngredient(ingredient.id!, ingredient.name)"
+            class="delete-btn"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Header and Row Definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="ingredient-row"></tr>
     </table>
   }
 </div>

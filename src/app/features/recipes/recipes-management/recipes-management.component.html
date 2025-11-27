@@ -3,6 +3,13 @@
   <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter une recette</button>
 </div>
 
+@if (error()) {
+  <div class="error-message">
+    <mat-icon>error</mat-icon>
+    <span>{{ error() }}</span>
+  </div>
+}
+
 <div class="search-section">
   <input
     type="text"
@@ -11,66 +18,77 @@
     [(ngModel)]="searchQuery"
     (input)="onSearch()"
   />
-  <span class="recipe-count">{{ filteredRecipes.length }} recette(s)</span>
+  <span class="recipe-count">{{ dataSource.data.length }} recette(s)</span>
 </div>
 
 <div class="recipes-table-container">
-  @if (filteredRecipes.length === 0) {
+  @if (dataSource.data.length === 0) {
     <div class="empty-state">
       <p>📋 Aucune recette trouvée.</p>
       <small>Commencez par en ajouter une !</small>
     </div>
   } @else {
-    <table class="recipes-table">
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Nom</th>
-          <th>Catégorie</th>
-          <th>Temps</th>
-          <th>Portions</th>
-          <th class="actions-header">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (recipe of filteredRecipes; track recipe.id) {
-          <tr class="recipe-row">
-            <td class="image-cell">
-              @if (recipe.image) {
-                <img [src]="recipe.image" [alt]="recipe.name" class="recipe-thumb" />
-              } @else {
-                <div class="recipe-thumb-placeholder">
-                  <span class="placeholder-icon">📸</span>
-                </div>
-              }
-            </td>
-            <td>{{ recipe.name }}</td>
-            <td>
-              <span class="category-badge">{{ recipe.category }}</span>
-            </td>
-            <td>{{ recipe.prepTime + recipe.cookTime }}min</td>
-            <td>{{ recipe.servings }} pers.</td>
-            <td class="actions-cell">
-              <button
-                mat-icon-button
-                matTooltip="Modifier"
-                (click)="openEditForm(recipe)"
-                class="edit-btn"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                matTooltip="Supprimer"
-                (click)="onDeleteRecipe(recipe.id!)"
-                class="delete-btn"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
+    <table mat-table [dataSource]="dataSource" matSort class="recipes-table">
+      <!-- Image Column -->
+      <ng-container matColumnDef="image">
+        <th mat-header-cell *matHeaderCellDef>Image</th>
+        <td mat-cell *matCellDef="let recipe" class="image-cell">
+          @if (recipe.image) {
+            <img [src]="recipe.image" [alt]="recipe.name" class="recipe-thumb" />
+          } @else {
+            <div class="recipe-thumb-placeholder">
+              <span class="placeholder-icon">📸</span>
+            </div>
+          }
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+        <td mat-cell *matCellDef="let recipe">{{ recipe.name }}</td>
+      </ng-container>
+
+      <!-- Category Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Catégorie</th>
+        <td mat-cell *matCellDef="let recipe">
+          <span class="category-badge">{{ recipe.category }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Time Column -->
+      <ng-container matColumnDef="time">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Temps</th>
+        <td mat-cell *matCellDef="let recipe">{{ recipe.prepTime + recipe.cookTime }}min</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let recipe" class="actions-cell">
+          <button
+            mat-icon-button
+            matTooltip="Modifier"
+            (click)="openEditForm(recipe)"
+            class="edit-btn"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matTooltip="Supprimer"
+            (click)="onDeleteRecipe(recipe.id!, recipe.name)"
+            class="delete-btn"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Header and Row Definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="recipe-row"></tr>
     </table>
   }
 </div>

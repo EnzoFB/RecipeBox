@@ -48,6 +48,7 @@ const SCHEMAS: Record<string, TableSchema> = {
       name TEXT NOT NULL,
       description TEXT,
       category TEXT,
+      difficulty INTEGER DEFAULT 2,
       image TEXT,
       prepTime INTEGER,
       cookTime INTEGER,
@@ -90,10 +91,25 @@ const SCHEMAS: Record<string, TableSchema> = {
       addedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE
     )`
+  },
+  shopping_list: {
+    name: 'shopping_list',
+    sql: `CREATE TABLE IF NOT EXISTS shopping_list (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ingredientId INTEGER NOT NULL,
+      quantityNeeded REAL NOT NULL,
+      unit TEXT NOT NULL,
+      sourceRecipeId INTEGER,
+      sourceRecipeName TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (ingredientId) REFERENCES ingredients(id) ON DELETE CASCADE,
+      FOREIGN KEY (sourceRecipeId) REFERENCES recipes(id) ON DELETE SET NULL
+    )`
   }
 };
 
 const MIGRATIONS = [
+  { table: 'recipes', column: 'difficulty', type: 'INTEGER DEFAULT 2' },
   { table: 'recipes', column: 'image', type: 'TEXT' },
   { table: 'ingredients', column: 'image', type: 'TEXT' },
   { table: 'ingredients', column: 'unitId', type: 'INTEGER REFERENCES units(id) ON DELETE SET NULL' }
@@ -277,7 +293,8 @@ class DatabaseManager {
       'Plats',
       10,
       20,
-      4
+      4,
+      2
     );
 
     const ingredients = [
@@ -307,7 +324,8 @@ class DatabaseManager {
       'Salades',
       15,
       0,
-      2
+      2,
+      1
     );
 
     const ingredients = [
@@ -338,7 +356,8 @@ class DatabaseManager {
       'Plats',
       10,
       15,
-      3
+      3,
+      2
     );
 
     const ingredients = [
@@ -367,18 +386,19 @@ class DatabaseManager {
     category: string,
     prepTime: number,
     cookTime: number,
-    servings: number
+    servings: number,
+    difficulty: number = 2
   ): Promise<number> {
     return new Promise((resolve, reject) => {
-      const sql = `INSERT INTO recipes (name, description, category, prepTime, cookTime, servings)
-                   VALUES (?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO recipes (name, description, category, prepTime, cookTime, servings, difficulty)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
       if (!this.db) {
         reject(new Error('Database not initialized'));
         return;
       }
 
-      this.db.run(sql, [name, description, category, prepTime, cookTime, servings], function (err) {
+      this.db.run(sql, [name, description, category, prepTime, cookTime, servings, difficulty], function (err) {
         if (err) {
           reject(err);
         } else {

@@ -38,6 +38,7 @@ export interface Recipe {
   name: string;
   description?: string;
   category?: string;
+  difficulty?: number;
   image?: string;
   prepTime?: number;
   cookTime?: number;

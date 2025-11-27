@@ -13,6 +13,23 @@
   }
 }
 
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #ffebee;
+  border-left: 4px solid #dc3545;
+  border-radius: 4px;
+  color: #c41c3b;
+  font-weight: 500;
+
+  mat-icon {
+    color: #dc3545;
+  }
+}
+
 .search-section {
   display: flex;
   align-items: center;

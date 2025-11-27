@@ -1,310 +1,350 @@
 .ingredient-form-page {
-  padding: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 0;
+}
 
-  .form-card {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-  }
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
 
-  mat-card-header {
-    background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
-    border-bottom: 2px solid #e0e0e0;
-    padding: 2rem;
-    margin: -16px -16px 2rem -16px;
-    border-radius: 12px 12px 0 0;
+// ============================================================================
+// Header Section
+// ============================================================================
 
-    mat-card-title {
-      margin: 0;
-      font-size: 1.75rem;
-      font-weight: 600;
+.page-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
-      .header-content {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        color: #c41c3b;
-
-        mat-icon {
-          font-size: 2rem;
-          width: 2rem;
-          height: 2rem;
-        }
-      }
-    }
-  }
-
-  mat-card-content {
-    padding: 2.5rem;
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 2.5rem;
-    }
-  }
-
-  .form-section {
-    padding: 2rem;
-    background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
-    border-radius: 12px;
-    border-left: 5px solid #c41c3b;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.3s ease;
+  .back-button {
+    color: #666;
+    transition: all 0.2s ease;
 
     &:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      background-color: #f5f5f5;
+      color: #007bff;
     }
+  }
 
-    h2 {
-      font-size: 1.25rem;
-      color: #222;
-      margin: 0 0 2rem 0;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+  .header-content {
+    flex: 1;
+
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: #333;
       font-weight: 600;
-
-      mat-icon {
-        color: #c41c3b;
-        font-size: 1.5rem;
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-    }
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    margin-bottom: 0;
-
-    mat-form-field {
-      width: 100%;
-    }
-  }
-
-  mat-form-field {
-    display: block;
-    margin-bottom: 1.5rem;
-
-    &.full-width {
-      width: 100%;
     }
 
-    ::ng-deep {
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__trailing {
-        border-radius: 8px;
-      }
-
-      .mat-mdc-form-field-infix {
-        padding-top: 1.25rem;
-        padding-bottom: 1.25rem;
-      }
+    .subtitle {
+      margin: 0.25rem 0 0 0;
+      color: #666;
+      font-size: 0.9rem;
     }
-  }
-
-  .image-upload {
-    margin-top: 1.5rem;
-
-    .image-preview {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      padding: 2.5rem;
-      background: #fff;
-      border-radius: 12px;
-      border: 2px solid #e8e8e8;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
-
-      &:hover {
-        border-color: #c41c3b;
-        box-shadow: 0 4px 16px rgba(196, 28, 59, 0.1);
-      }
-
-      img {
-        max-width: 280px;
-        max-height: 280px;
-        object-fit: cover;
-        border-radius: 10px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-        border: 2px solid #f0f0f0;
-      }
-
-      button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        padding: 0.95rem 1.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-
-        mat-icon {
-          font-size: 1.25rem;
-          width: 1.25rem;
-          height: 1.25rem;
-        }
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-      }
-    }
-
-    .upload-label {
-      display: block;
-      cursor: pointer;
-      width: 100%;
-
-      .upload-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        padding: 3rem 2rem;
-        background: linear-gradient(135deg, #fff9fa 0%, #fff 100%);
-        border: 3px dashed #c41c3b;
-        border-radius: 12px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #c41c3b;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        letter-spacing: 0.3px;
-
-        mat-icon {
-          font-size: 2rem;
-          width: 2rem;
-          height: 2rem;
-        }
-
-        &:hover {
-          border-color: #a01730;
-          background: linear-gradient(135deg, #fff3f5 0%, #fff9fa 100%);
-          color: #a01730;
-          box-shadow: 0 6px 24px rgba(196, 28, 59, 0.15);
-          transform: translateY(-2px);
-        }
-      }
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: flex-end;
-    padding-top: 2rem;
-    margin-top: 2rem;
-    border-top: 1px solid #e0e0e0;
-
-    button {
-      min-width: 140px;
-      padding: 0.95rem 2rem;
-      font-size: 1rem;
-      font-weight: 500;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      transition: all 0.3s ease;
-
-      mat-icon {
-        font-size: 1.25rem;
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-
-      &[mat-stroked-button] {
-        color: #666;
-
-        &:hover {
-          background-color: #f5f5f5;
-        }
-      }
-
-      &[mat-raised-button] {
-        box-shadow: 0 2px 8px rgba(196, 28, 59, 0.2);
-
-        &:not(:disabled):hover {
-          box-shadow: 0 4px 16px rgba(196, 28, 59, 0.3);
-          transform: translateY(-2px);
-        }
-
-        &:disabled {
-          background-color: #d3d3d3;
-          color: #333;
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
-
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 400px;
   }
 }
 
-@media (max-width: 768px) {
-  .ingredient-form-page {
+// ============================================================================
+// Form Container
+// ============================================================================
+
+.form-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 2rem 2rem 2rem;
+
+  @media (max-width: 768px) {
+    padding: 0 1rem 1rem 1rem;
+    margin: 1rem auto;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+// ============================================================================
+// Two Column Layout
+// ============================================================================
+
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr 350px;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-column-left,
+.form-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ============================================================================
+// Form Sections
+// ============================================================================
+
+.form-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .section-title {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  &.image-section {
+    top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+
+    &.image-section {
+      position: static;
+    }
+  }
+}
+
+// ============================================================================
+// Form Fields Layout
+// ============================================================================
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================================
+// Image Upload Section
+// ============================================================================
+
+.image-upload-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+
+  .image-preview {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(220, 53, 69, 0.9);
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .upload-zone {
+    display: flex;
+    width: 100%;
+    height: 280px;
+    border: 2px dashed #007bff;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+
+    &:hover {
+      border-color: #0056b3;
+      background: #e7f3ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    }
+
+    .upload-icon {
+      text-align: center;
+      color: #007bff;
+
+      mat-icon {
+        font-size: 3.5rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        margin: 0 auto;
+        transition: transform 0.2s ease;
+      }
+
+      p {
+        margin: 0.75rem 0 0 0;
+        font-size: 0.95rem;
+        color: #666;
+        font-weight: 500;
+      }
+    }
+
+    &:hover .upload-icon mat-icon {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// ============================================================================
+// Empty State
+// ============================================================================
+
+.empty-message {
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #ddd;
+  font-size: 0.95rem;
+}
+
+// ============================================================================
+// Form Actions
+// ============================================================================
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem;
+  background: white;
+  border-top: 2px solid #f0f0f0;
+  margin: 2rem -2rem 0 -2rem;
+  border-radius: 0 0 12px 12px;
+
+  button {
+    min-width: 140px;
+    height: 48px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &[mat-stroked-button] {
+      &:hover {
+        background-color: #f8f9fa;
+        border-color: #999;
+      }
+    }
+
+    &[mat-raised-button]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
     padding: 1rem;
+    margin: 1.5rem -1.5rem 0 -1.5rem;
 
-    .form-section {
-      padding: 1.5rem;
-      margin: 0;
+    button {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+}
+
+// Angular Material Form Field Adjustments
+::ng-deep {
+  .mat-mdc-form-field {
+    width: 100%;
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__trailing {
+      border-radius: 8px;
     }
 
-    .form-row {
-      grid-template-columns: 1fr;
-      gap: 1rem;
+    .mat-mdc-form-field-infix {
+      padding-top: 1.25rem;
+      padding-bottom: 1.25rem;
     }
 
-    .form-actions {
-      flex-direction: column;
-      gap: 1rem;
-
-      button {
-        width: 100%;
-      }
-    }
-
-    mat-card-header {
-      margin: -16px -16px 1.5rem -16px;
-      padding: 1.5rem;
-
-      mat-card-title {
-        font-size: 1.5rem;
-
-        .header-content {
-          gap: 0.75rem;
-
-          mat-icon {
-            font-size: 1.5rem;
-            width: 1.5rem;
-            height: 1.5rem;
-          }
-        }
-      }
-    }
-
-    mat-card-content {
-      padding: 1.5rem;
-
-      form {
-        gap: 1.5rem;
-      }
+    .mat-mdc-form-field-hint {
+      color: #999;
+      font-size: 0.85rem;
     }
   }
 }

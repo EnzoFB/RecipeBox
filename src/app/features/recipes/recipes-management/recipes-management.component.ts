@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,10 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { takeUntil } from 'rxjs';
 import { Recipe } from '../../../core/models';
 import { RecipeService } from '../../../core/services';
+import { BaseCrudManagementComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-recipes-management',
@@ -25,71 +28,63 @@ import { RecipeService } from '../../../core/services';
     MatFormFieldModule,
     MatCardModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatTableModule,
+    MatSortModule
   ],
   templateUrl: './recipes-management.component.html',
   styleUrl: './recipes-management.component.scss'
 })
-export class RecipesManagementComponent implements OnInit, OnDestroy {
-  recipes = signal<Recipe[]>([]);
-  searchQuery = signal('');
-  private readonly destroy$ = new Subject<void>();
+export class RecipesManagementComponent extends BaseCrudManagementComponent<Recipe> implements OnInit {
+  displayedColumns: string[] = ['image', 'name', 'category', 'time', 'actions'];
 
   constructor(
     private readonly recipeService: RecipeService,
-    private readonly router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.loadRecipes();
+    router: Router
+  ) {
+    super(router);
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  private loadRecipes(): void {
-    this.recipeService.getRecipes()
+  protected loadData(): void {
+    this.setLoading(true);
+    this.recipeService
+      .getRecipes()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(recipes => {
-        this.recipes.set(recipes);
+      .subscribe({
+        next: (recipes) => {
+          this.setItems(recipes);
+          this.setLoading(false);
+          this.clearError();
+        },
+        error: (error) => {
+          this.setError('Erreur lors du chargement des recettes');
+          this.setLoading(false);
+          console.error('Error loading recipes:', error);
+        }
       });
   }
 
-  openAddForm(): void {
-    this.router.navigate(['/recipes/create']);
-  }
-
-  openEditForm(recipe: Recipe): void {
-    this.router.navigate(['/recipes', recipe.id, 'edit']);
-  }
-
-  onDeleteRecipe(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette recette ?')) {
-      this.recipeService.deleteRecipe(id);
-      this.loadRecipes();
-    }
-  }
-
-  onSearch(): void {
-    const query = this.searchQuery();
-    if (query.trim()) {
-      const filtered = this.recipeService.searchRecipes(query);
-      this.recipes.set(filtered);
-    } else {
-      this.loadRecipes();
-    }
-  }
-
-  get filteredRecipes(): Recipe[] {
-    const query = this.searchQuery().toLowerCase();
-    if (!query) return this.recipes();
-
-    return this.recipes().filter(recipe =>
+  protected filter(recipes: Recipe[], query: string): Recipe[] {
+    return recipes.filter(recipe =>
       recipe.name?.toLowerCase().includes(query) ||
       recipe.category?.toLowerCase().includes(query)
     );
   }
+
+  openAddForm(): void {
+    this.navigateToCreate('/recipes/create');
+  }
+
+  openEditForm(recipe: Recipe): void {
+    this.navigateToEdit('/recipes', recipe.id);
+  }
+
+  onDeleteRecipe(id: number, name?: string): void {
+    if (this.confirmDeletion(name)) {
+      this.recipeService.deleteRecipe(id);
+      this.loadData();
+    }
+  }
 }
+
 

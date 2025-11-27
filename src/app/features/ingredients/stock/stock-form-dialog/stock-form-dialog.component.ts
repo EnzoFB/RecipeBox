@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { IngredientStock, Ingredient, Unit } from '../../../../core/models';
+import { IngredientStock, Ingredient } from '../../../../core/models';
 import { UnitService } from '../../../../core/services';
 
 @Component({
@@ -29,8 +29,7 @@ export class StockFormDialogComponent implements OnInit {
   form!: FormGroup;
   isEditMode = false;
   selectedIngredient: Ingredient | null = null;
-  selectedUnit: Unit | null = null;
-  private unitsMap: Map<number, Unit> = new Map();
+  private unitsMap: Map<number, string> = new Map();
 
   constructor(
     private readonly fb: FormBuilder,
@@ -46,47 +45,60 @@ export class StockFormDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Build units map
+    // Load units map
     this.unitService.getUnits().subscribe(units => {
-      this.unitsMap = new Map(units.map(u => [u.id!, u]));
-      
-      if (this.data.item) {
-        this.isEditMode = true;
-        this.form.patchValue({
-          ingredientId: this.data.item.ingredientId,
-          quantity: this.data.item.quantity,
-          expiryDate: this.data.item.expiryDate
-        });
-        this.onIngredientSelected();
-      }
+      this.unitsMap = new Map(units.map(u => [u.id!, u.symbol]));
     });
 
+    if (this.data.item) {
+      // Check if the ingredient still exists
+      const ingredientExists = this.data.ingredients.find(i => i.id === this.data.item!.ingredientId);
+      
+      if (!ingredientExists) {
+        // Close the dialog since the ingredient was deleted
+        this.dialogRef.close();
+        return;
+      }
+
+      this.isEditMode = true;
+      this.form.patchValue({
+        ingredientId: this.data.item.ingredientId,
+        quantity: this.data.item.quantity,
+        expiryDate: this.data.item.expiryDate
+      });
+      this.onIngredientSelected();
+    }
+
     // Listen for ingredient changes
-    this.form.get('ingredientId')?.valueChanges.subscribe(() => {
+    this.form.get('ingredientId')?.valueChanges.subscribe((value) => {
       this.onIngredientSelected();
     });
   }
 
   private onIngredientSelected(): void {
     const ingredientId = this.form.get('ingredientId')?.value;
+    
     if (ingredientId) {
       this.selectedIngredient = this.data.ingredients.find(i => i.id === ingredientId) || null;
-      if (this.selectedIngredient?.unitId) {
-        this.selectedUnit = this.unitsMap.get(this.selectedIngredient.unitId) || null;
-      }
     } else {
       this.selectedIngredient = null;
-      this.selectedUnit = null;
     }
   }
 
-  onSubmit(): void {
-    if (!this.form.valid || !this.selectedUnit) return;
+  onSubmit(): void {    
+    if (!this.form.valid || !this.selectedIngredient) {
+      return;
+    }
 
-    const formData: IngredientStock = {
+    // Get unit symbol, default to empty string if not found
+    const unitSymbol = this.selectedIngredient.unitId 
+      ? (this.unitsMap.get(this.selectedIngredient.unitId) || '')
+      : '';
+
+    const formData = {
       ingredientId: this.form.get('ingredientId')?.value,
       quantity: this.form.get('quantity')?.value,
-      unit: this.selectedUnit.symbol,
+      unit: unitSymbol,
       expiryDate: this.form.get('expiryDate')?.value
     };
 

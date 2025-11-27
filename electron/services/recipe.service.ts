@@ -95,12 +95,13 @@ export class RecipeService {
         }
 
         db.run(
-          `INSERT INTO recipes (name, description, category, image, prepTime, cookTime, servings)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO recipes (name, description, category, difficulty, image, prepTime, cookTime, servings)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             recipe.name,
             recipe.description || null,
             recipe.category || null,
+            recipe.difficulty || 2,
             recipe.image || null,
             recipe.prepTime || null,
             recipe.cookTime || null,
@@ -148,6 +149,7 @@ export class RecipeService {
          SET name = COALESCE(?, name),
              description = COALESCE(?, description),
              category = COALESCE(?, category),
+             difficulty = COALESCE(?, difficulty),
              image = COALESCE(?, image),
              prepTime = COALESCE(?, prepTime),
              cookTime = COALESCE(?, cookTime),
@@ -158,6 +160,7 @@ export class RecipeService {
           recipe.name || null,
           recipe.description || null,
           recipe.category || null,
+          recipe.difficulty || null,
           recipe.image || null,
           recipe.prepTime || null,
           recipe.cookTime || null,

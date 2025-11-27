@@ -1,17 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { IngredientFormComponent } from './ingredient-form/ingredient-form.component';
 import { Ingredient, INGREDIENT_CATEGORIES, Unit } from '../../core/models';
 import { IngredientService, UnitService } from '../../core/services';
 
 @Component({
   selector: 'app-ingredients',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, MatButtonModule, MatCardModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatCardModule],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })
@@ -25,7 +24,7 @@ export class IngredientsComponent implements OnInit {
   constructor(
     private readonly ingredientService: IngredientService,
     private readonly unitService: UnitService,
-    private readonly dialog: MatDialog
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -39,27 +38,11 @@ export class IngredientsComponent implements OnInit {
   }
 
   openAddForm(): void {
-    this.dialog.open(IngredientFormComponent, {
-      width: '600px',
-      maxHeight: '90vh',
-      data: { ingredient: null }
-    }).afterClosed().subscribe((result: any) => {
-      if (result) {
-        this.ingredientService.addIngredient(result);
-      }
-    });
+    this.router.navigate(['/ingredients/create']);
   }
 
   openEditForm(ingredient: Ingredient): void {
-    this.dialog.open(IngredientFormComponent, {
-      width: '600px',
-      maxHeight: '90vh',
-      data: { ingredient }
-    }).afterClosed().subscribe((result: any) => {
-      if (result) {
-        this.ingredientService.updateIngredient(ingredient.id!, result);
-      }
-    });
+    this.router.navigate(['/ingredients', ingredient.id, 'edit']);
   }
 
   onDeleteIngredient(id: number): void {

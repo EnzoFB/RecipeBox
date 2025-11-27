@@ -1,45 +1,80 @@
-<div class="header">
-  <h1>📦 Gestion du Stock</h1>
-  <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter au stock</button>
+<div class="page-header">
+  <h1>📦 Stock</h1>
+  <p class="subtitle">Gérez vos ingrédients en stock</p>
+  <button mat-raised-button color="primary" (click)="openAddForm()">+ Ajouter</button>
 </div>
 
-<div class="stock-grid">
+<div class="stock-container">
   @if (stock().length === 0) {
     <div class="empty-state">
-      <p>Aucun stock pour le moment. Commencez par en ajouter !</p>
+      <div class="empty-icon">📭</div>
+      <h2>Stock vide</h2>
+      <p>Aucun ingrédient en stock. Commencez par en ajouter !</p>
     </div>
   }
 
-  @for (item of stock(); track item.id) {
-    <mat-card class="stock-card" [ngClass]="getExpiryStatusClass(item)">
-      <mat-card-header>
-        <h3>{{ getIngredientName(item.ingredientId) }}</h3>
-        <span class="category-badge">{{ item.category }}</span>
-      </mat-card-header>
+  @if (stock().length > 0) {
+    <div class="stock-grid">
+      @for (item of stock(); track item.id) {
+        <div class="stock-card" [ngClass]="getExpiryStatusClass(item)">
+          <!-- Status Badge -->
+          @if (item.isExpired) {
+            <div class="status-badge expired">
+              <span class="badge-icon">⚠️</span>
+              <span class="badge-text">Expiré</span>
+            </div>
+          } @else if (item.daysToExpiry <= 3) {
+            <div class="status-badge expiring">
+              <span class="badge-icon">⏰</span>
+              <span class="badge-text">À utiliser rapidement</span>
+            </div>
+          }
 
-      <mat-card-content>
-        <div class="info-row">
-          <span class="label">Quantité:</span>
-          <span class="value">{{ item.quantity }} {{ item.unit }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Expiration:</span>
-          <span class="value" [ngClass]="{ 'expired-text': item.isExpired }">
-            {{ item.expiryDate }}
-          </span>
-        </div>
-        <div class="info-row">
-          <span class="label">Statut:</span>
-          <span class="value" [ngClass]="getExpiryStatusClass(item)">
-            {{ getExpiryStatus(item) }}
-          </span>
-        </div>
-      </mat-card-content>
+          <!-- Card Header -->
+          <div class="card-header">
+            <h3 class="ingredient-name">{{ getIngredientName(item.ingredientId) }}</h3>
+            <span class="category-tag">{{ item.category }}</span>
+          </div>
 
-      <mat-card-actions>
-        <button mat-button (click)="openEditForm(item)">Modifier</button>
-        <button mat-button color="warn" (click)="onDeleteStock(item.id)">Supprimer</button>
-      </mat-card-actions>
-    </mat-card>
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="quantity-section">
+              <div class="quantity-value">{{ item.quantity }}</div>
+              <div class="quantity-unit">{{ item.unit }}</div>
+            </div>
+
+            <div class="expiry-info">
+              <div class="expiry-label">Expiration</div>
+              <div class="expiry-date" [ngClass]="{ 'expired-text': item.isExpired }">
+                {{ item.expiryDate }}
+              </div>
+              <div class="days-left">
+                @if (item.isExpired) {
+                  <span class="expired-tag">Dépassé depuis</span>
+                } @else if (item.daysToExpiry === 0) {
+                  <span class="urgent-tag">Aujourd'hui</span>
+                } @else if (item.daysToExpiry === 1) {
+                  <span class="urgent-tag">Demain</span>
+                } @else if (item.daysToExpiry < 3) {
+                  <span class="warning-tag">{{ item.daysToExpiry }} jours</span>
+                } @else {
+                  <span class="valid-tag">{{ item.daysToExpiry }} jours</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="card-actions">
+            <button mat-icon-button matTooltip="Modifier" (click)="openEditForm(item)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Supprimer" color="warn" (click)="onDeleteStock(item.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
   }
 </div>

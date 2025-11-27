@@ -1,0 +1,168 @@
+<div class="shopping-list-container">
+  <div class="header">
+    <h1>🛒 Liste de Courses</h1>
+    <span class="total-items">{{ totalItems }} article(s)</span>
+  </div>
+
+  @if (shoppingList.length === 0) {
+    <mat-card class="empty-state">
+      <p>Votre liste de courses est vide!</p>
+      <p><small>Allez voir une recette et ajoutez les ingrédients manquants.</small></p>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Retour aux recettes
+      </button>
+    </mat-card>
+  } @else {
+    <mat-tab-group>
+      <!-- Mode Edition -->
+      <mat-tab label="📝 Édition">
+        <div class="tab-content">
+          <button mat-raised-button (click)="clearShoppingList()" color="warn" class="action-btn">
+            <mat-icon>delete_sweep</mat-icon>
+            Vider la liste
+          </button>
+
+          <table mat-table [dataSource]="dataSource" class="shopping-table">
+            <!-- Ingredient Name Column -->
+            <ng-container matColumnDef="ingredientName">
+              <th mat-header-cell *matHeaderCellDef>Ingrédient</th>
+              <td mat-cell *matCellDef="let item">{{ item.ingredientName }}</td>
+            </ng-container>
+
+            <!-- Quantity Column -->
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef>Quantité</th>
+              <td mat-cell *matCellDef="let item">
+                <input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  [value]="item.quantityNeeded"
+                  (change)="updateQuantity(item, $event.target.value)"
+                  class="quantity-input"
+                />
+              </td>
+            </ng-container>
+
+            <!-- Unit Column -->
+            <ng-container matColumnDef="unit">
+              <th mat-header-cell *matHeaderCellDef>Unité</th>
+              <td mat-cell *matCellDef="let item">{{ item.unit }}</td>
+            </ng-container>
+
+            <!-- Source Recipe Column -->
+            <ng-container matColumnDef="sourceRecipe">
+              <th mat-header-cell *matHeaderCellDef>Recette</th>
+              <td mat-cell *matCellDef="let item">
+                @if (item.sourceRecipeName) {
+                  <span class="recipe-badge">{{ item.sourceRecipeName }}</span>
+                }
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let item">
+                <button mat-icon-button color="warn" (click)="deleteItem(item.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <div class="tab-actions">
+            <button mat-raised-button color="primary" (click)="toggleBuyMode()">
+              <mat-icon>shopping_cart</mat-icon>
+              Passer au mode achat
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Mode Achat -->
+      <mat-tab label="🛍️ Achat">
+        <div class="tab-content">
+          <div class="buy-mode-info">
+            <p>📝 Indiquez la quantité achetée et la date de péremption, puis cliquez sur "Ajouter au stock"</p>
+          </div>
+
+          <table mat-table [dataSource]="dataSource" class="shopping-table">
+            <!-- Ingredient Name Column -->
+            <ng-container matColumnDef="ingredientName">
+              <th mat-header-cell *matHeaderCellDef>Ingrédient</th>
+              <td mat-cell *matCellDef="let item">{{ item.ingredientName }}</td>
+            </ng-container>
+
+            <!-- Quantity Needed Column -->
+            <ng-container matColumnDef="quantityNeeded">
+              <th mat-header-cell *matHeaderCellDef>À acheter</th>
+              <td mat-cell *matCellDef="let item">{{ item.quantityNeeded | number: '1.2-2' }} {{ item.unit }}</td>
+            </ng-container>
+
+            <!-- Quantity Bought Column -->
+            <ng-container matColumnDef="boughtQuantity">
+              <th mat-header-cell *matHeaderCellDef>Acheté</th>
+              <td mat-cell *matCellDef="let item">
+                <input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  [(ngModel)]="item.boughtQuantity"
+                  class="quantity-input"
+                  placeholder="Quantité"
+                />
+              </td>
+            </ng-container>
+
+            <!-- Expiry Date Column -->
+            <ng-container matColumnDef="expiryDate">
+              <th mat-header-cell *matHeaderCellDef>Date péremption</th>
+              <td mat-cell *matCellDef="let item">
+                <input
+                  type="date"
+                  [(ngModel)]="item.expiryDateForBought"
+                  class="date-input"
+                />
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let item">
+                <button
+                  mat-raised-button
+                  color="accent"
+                  size="small"
+                  (click)="addItemToStock(item)"
+                >
+                  <mat-icon>check</mat-icon>
+                  Ajouter
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="buyingColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: buyingColumns;"></tr>
+          </table>
+
+          <div class="tab-actions">
+            <button mat-raised-button color="primary" (click)="addAllToStock()">
+              <mat-icon>check_circle</mat-icon>
+              Ajouter tous au stock
+            </button>
+            <button mat-button (click)="toggleBuyMode()">
+              <mat-icon>close</mat-icon>
+              Retour
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { IngredientStock, StockWithDaysToExpiry, Ingredient } from '../../../core/models';
 import { IngredientStockService } from '../../../core/services/ingredient-stock.service';
 import { IngredientService } from '../../../core/services/ingredient.service';
@@ -16,7 +17,8 @@ import { StockFormDialogComponent } from './stock-form-dialog/stock-form-dialog.
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTooltipModule
   ],
   templateUrl: './stock.component.html',
   styleUrl: './stock.component.scss'
@@ -24,6 +26,7 @@ import { StockFormDialogComponent } from './stock-form-dialog/stock-form-dialog.
 export class StockComponent implements OnInit {
   stock = signal<StockWithDaysToExpiry[]>([]);
   availableIngredients = signal<Ingredient[]>([]);
+  private currentDialog: any = null;
 
   constructor(
     private readonly stockService: IngredientStockService,
@@ -56,10 +59,13 @@ export class StockComponent implements OnInit {
   }
 
   openEditForm(item: IngredientStock): void {
-    this.dialog.open(StockFormDialogComponent, {
+    this.currentDialog = this.dialog.open(StockFormDialogComponent, {
       width: '500px',
       data: { item, ingredients: this.availableIngredients() }
-    }).afterClosed().subscribe((result: any) => {
+    });
+    
+    this.currentDialog.afterClosed().subscribe((result: any) => {
+      this.currentDialog = null;
       if (result) {
         this.stockService.updateStock(item.id!, result);
         this.stock.set(this.stockService.getStockWithExpiry());
@@ -69,6 +75,13 @@ export class StockComponent implements OnInit {
 
   onDeleteStock(id: number | undefined): void {
     if (!id || !confirm('Êtes-vous sûr de vouloir supprimer ce stock ?')) return;
+    
+    // Close the edit dialog if it's open
+    if (this.currentDialog) {
+      this.currentDialog.close();
+      this.currentDialog = null;
+    }
+    
     this.stockService.deleteStock(id);
   }
 

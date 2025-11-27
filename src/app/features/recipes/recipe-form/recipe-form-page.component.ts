@@ -11,7 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { Recipe, Ingredient, RecipeFormData, RECIPE_CATEGORIES, DEFAULT_UNITS } from '../../../core/models';
+import { Recipe, Ingredient, RecipeFormData, RECIPE_CATEGORIES, DEFAULT_UNITS, DIFFICULTY_LABELS, DIFFICULTY_LEVELS } from '../../../core/models';
 import { IngredientService, RecipeService } from '../../../core/services';
 
 @Component({
@@ -48,6 +48,8 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
   // Constants pour les options du formulaire
   readonly recipeCategories = RECIPE_CATEGORIES;
   readonly availableUnits = DEFAULT_UNITS.map(u => u.symbol);
+  readonly difficultyLevels = DIFFICULTY_LEVELS;
+  readonly difficultyLabels = DIFFICULTY_LABELS;
 
   private readonly destroy$ = new Subject<void>();
   private recipeId: number | null = null;
@@ -63,9 +65,9 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
       category: ['', Validators.required],
+      difficulty: [2, Validators.required],
       prepTime: [15, [Validators.required, Validators.min(0)]],
       cookTime: [30, [Validators.required, Validators.min(0)]],
-      servings: [4, [Validators.required, Validators.min(1)]],
       ingredientId: [''],
       quantity: [1, [Validators.required, Validators.min(0.1)]],
       unit: ['g']
@@ -119,9 +121,9 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
       name: recipe.name,
       description: recipe.description,
       category: recipe.category,
+      difficulty: recipe.difficulty,
       prepTime: recipe.prepTime,
-      cookTime: recipe.cookTime,
-      servings: recipe.servings
+      cookTime: recipe.cookTime
     });
     this.steps.set(recipe.steps ? [...recipe.steps] : []);
     this.selectedIngredients.set(recipe.ingredients ? [...recipe.ingredients] : []);
@@ -211,9 +213,9 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
       name: this.form.get('name')?.value,
       description: this.form.get('description')?.value,
       category: this.form.get('category')?.value,
+      difficulty: this.form.get('difficulty')?.value,
       prepTime: this.form.get('prepTime')?.value,
       cookTime: this.form.get('cookTime')?.value,
-      servings: this.form.get('servings')?.value,
       image: this.imageBase64() || undefined,
       ingredients: this.selectedIngredients(),
       steps: this.steps()
@@ -225,11 +227,11 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
       this.recipeService.addRecipe(formData);
     }
 
-    this.router.navigate(['/recipes']);
+    this.router.navigate(['/recipes/manage']);
   }
 
   onCancel(): void {
-    this.router.navigate(['/recipes']);
+    this.router.navigate(['/recipes/manage']);
   }
 
   getIngredientName(ingredientId: number): string {
@@ -254,9 +256,9 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
 
   private showValidationErrors(): void {
     if (!this.form.valid) {
-      Object.keys(this.form.controls).forEach(key => {
+      for (const key of Object.keys(this.form.controls)) {
         this.form.get(key)?.markAsTouched();
-      });
+      }
     }
     
     if (this.selectedIngredients().length === 0) {

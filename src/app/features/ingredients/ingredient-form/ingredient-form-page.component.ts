@@ -11,7 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Ingredient, INGREDIENT_CATEGORIES } from '../../../core/models';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Ingredient, INGREDIENT_CATEGORIES, Unit } from '../../../core/models';
 import { IngredientService, UnitService } from '../../../core/services';
 
 @Component({
@@ -26,7 +27,8 @@ import { IngredientService, UnitService } from '../../../core/services';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   templateUrl: './ingredient-form-page.component.html',
   styleUrl: './ingredient-form-page.component.scss'
@@ -37,7 +39,7 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
   isLoading = false;
   imagePreview: string | null = null;
   categories = INGREDIENT_CATEGORIES;
-  units: any[] = [];
+  units: Unit[] = [];
 
   private readonly destroy$ = new Subject<void>();
   private ingredientId: number | null = null;
@@ -53,13 +55,23 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Load units from service Observable
+    // Load units from service (don't block on units)
     this.unitService.getUnits()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(units => {
-        this.units = units;
+      .subscribe({
+        next: (units) => {
+          // Ensure units have IDs (fallback if needed)
+          this.units = units.map((u, index) => ({
+            ...u,
+            id: u.id || index + 1
+          }));
+        },
+        error: (err) => {
+          console.error('Error loading units:', err);
+        }
       });
 
+    // Check if editing
     this.route.params
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
@@ -67,6 +79,8 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
           this.ingredientId = Number.parseInt(params['id'], 10);
           this.isEditMode = true;
           this.loadIngredient();
+        } else {
+          this.isLoading = false;
         }
       });
   }

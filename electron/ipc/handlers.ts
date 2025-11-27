@@ -4,13 +4,14 @@
 
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { Logger } from '../logger';
-import { RecipeService, IngredientService, StockService } from '../services';
+import { RecipeService, IngredientService, StockService, ShoppingListService } from '../services';
 
 const logger = new Logger('IPCHandlers');
 
 const recipeService = new RecipeService();
 const ingredientService = new IngredientService();
 const stockService = new StockService();
+const shoppingListService = new ShoppingListService();
 
 // ============================================================================
 // Error Handler Wrapper
@@ -188,6 +189,104 @@ export function registerStockHandlers(): void {
 }
 
 // ============================================================================
+// Shopping List Handlers
+// ============================================================================
+
+export function registerShoppingListHandlers(): void {
+  ipcMain.handle('shoppingList:getAll', async (_event: IpcMainInvokeEvent) => {
+    try {
+      logger.debug('IPC: shoppingList:getAll');
+      return await shoppingListService.getAll();
+    } catch (error) {
+      handleIpcError('shoppingList:getAll', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:getWithDetails', async (_event: IpcMainInvokeEvent) => {
+    try {
+      logger.debug('IPC: shoppingList:getWithDetails');
+      return await shoppingListService.getWithIngredientDetails();
+    } catch (error) {
+      handleIpcError('shoppingList:getWithDetails', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:add', async (_event: IpcMainInvokeEvent, item: any) => {
+    try {
+      logger.debug('IPC: shoppingList:add');
+      return await shoppingListService.add(item);
+    } catch (error) {
+      handleIpcError('shoppingList:add', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:addBulk', async (_event: IpcMainInvokeEvent, items: any[]) => {
+    try {
+      logger.debug('IPC: shoppingList:addBulk');
+      return await shoppingListService.addBulk(items);
+    } catch (error) {
+      handleIpcError('shoppingList:addBulk', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:update', async (_event: IpcMainInvokeEvent, id: number, item: any) => {
+    try {
+      logger.debug(`IPC: shoppingList:update (${id})`);
+      return await shoppingListService.update(id, item);
+    } catch (error) {
+      handleIpcError('shoppingList:update', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:delete', async (_event: IpcMainInvokeEvent, id: number) => {
+    try {
+      logger.debug(`IPC: shoppingList:delete (${id})`);
+      return await shoppingListService.delete(id);
+    } catch (error) {
+      handleIpcError('shoppingList:delete', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:deleteByIngredient', async (_event: IpcMainInvokeEvent, ingredientId: number) => {
+    try {
+      logger.debug(`IPC: shoppingList:deleteByIngredient (${ingredientId})`);
+      return await shoppingListService.deleteByIngredient(ingredientId);
+    } catch (error) {
+      handleIpcError('shoppingList:deleteByIngredient', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:deleteByRecipe', async (_event: IpcMainInvokeEvent, recipeId: number) => {
+    try {
+      logger.debug(`IPC: shoppingList:deleteByRecipe (${recipeId})`);
+      return await shoppingListService.deleteByRecipe(recipeId);
+    } catch (error) {
+      handleIpcError('shoppingList:deleteByRecipe', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('shoppingList:clear', async (_event: IpcMainInvokeEvent) => {
+    try {
+      logger.debug('IPC: shoppingList:clear');
+      return await shoppingListService.clear();
+    } catch (error) {
+      handleIpcError('shoppingList:clear', error);
+      throw error;
+    }
+  });
+
+  logger.info('✓ Shopping List IPC handlers registered');
+}
+
+// ============================================================================
 // Register All Handlers
 // ============================================================================
 
@@ -195,5 +294,6 @@ export function registerAllHandlers(): void {
   registerRecipeHandlers();
   registerIngredientHandlers();
   registerStockHandlers();
+  registerShoppingListHandlers();
   logger.success('All IPC handlers registered');
 }

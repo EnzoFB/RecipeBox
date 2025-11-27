@@ -1,56 +1,185 @@
-<div class="header">
-  <h1>📖 Mes Recettes</h1>
-  <button mat-raised-button color="primary" (click)="openAddForm()">
-    <mat-icon>add</mat-icon>
-    Nouvelle recette
-  </button>
-</div>
-
-<div class="search-section">
-  <input
-    type="text"
-    class="search-input"
-    placeholder="Rechercher une recette réalisable..."
-    [(ngModel)]="searchQuery"
-    (input)="onSearch()"
-  />
-</div>
-
-<div class="recipes-grid">
-  @if (filteredRecipes.length === 0) {
-    <div class="empty-state">
-      <p>✅ Aucune recette réalisable avec votre stock actuel.</p>
-      <small>Ajoutez des ingrédients au stock pour commencer !</small>
+<div class="recipes-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📖 Mes Recettes</h1>
+      <p class="subtitle">Découvrez et cuisinez vos recettes préférées</p>
     </div>
-  }
+  </div>
 
-  @for (recipe of filteredRecipes; track recipe.id) {
-    <mat-card class="recipe-card feasible-card">
-      <div class="recipe-image">
-        @if (recipe.image) {
-          <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-photo" />
-        } @else {
-          <div class="recipe-placeholder">
-            <span class="placeholder-icon">📸</span>
-          </div>
-        }
-      </div>
-      <mat-card-header>
-        <h3>{{ recipe.name }}</h3>
-        <span class="category-badge">{{ recipe.category }}</span>
-        <span class="feasible-badge">✓ Réalisable</span>
-      </mat-card-header>
-      <mat-card-content>
-        <p class="recipe-description">{{ recipe.description }}</p>
-        <div class="recipe-info">
-          <span class="info-item">⏱️ {{ recipe.prepTime + recipe.cookTime }}min</span>
-          <span class="info-item">👥 {{ recipe.servings }} pers.</span>
+  <!-- Search Section -->
+  <div class="search-section">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="🔍 Rechercher une recette..."
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+    />
+  </div>
+
+  <!-- Recipes Display -->
+  <div class="recipes-container">
+    <!-- Recipes Réalisables Section -->
+    @if ((filteredRecipes | filterByStatus: true).length > 0) {
+      <section class="recipes-section ready-section">
+        <div class="section-header">
+          <h2>✅ Recettes Réalisables</h2>
+          <span class="count-badge">{{ (filteredRecipes | filterByStatus: true).length }}</span>
         </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button (click)="openEditForm(recipe)">Modifier</button>
-        <button mat-button color="warn" (click)="onDeleteRecipe(recipe.id!)">Supprimer</button>
-      </mat-card-actions>
-    </mat-card>
-  }
+
+        <div class="recipes-grid">
+          @for (recipe of (filteredRecipes | filterByStatus: true) | sliceByExpiry; track recipe.id) {
+            <mat-card [class.recipe-card]="true" [class.has-expiring]="recipe.hasExpiringIngredients">
+              <!-- Expiring Badge -->
+              @if (recipe.hasExpiringIngredients) {
+                <div class="expiring-badge">
+                  ⏰ À utiliser rapidement
+                </div>
+              }
+
+              <!-- Recipe Image -->
+              <div class="recipe-image">
+                @if (recipe.image) {
+                  <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-photo" />
+                } @else {
+                  <div class="recipe-placeholder">
+                    <span class="placeholder-icon">📸</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Recipe Header -->
+              <mat-card-header>
+                <div class="header-top">
+                  <h3>{{ recipe.name }}</h3>
+                  <span class="category-badge">{{ recipe.category }}</span>
+                </div>
+                <div class="difficulty-time">
+                  <span class="difficulty" [class]="'difficulty-' + recipe.difficulty">
+                    {{ getDifficultyLabel(recipe.difficulty) }}
+                  </span>
+                  <span class="time">⏱️ {{ recipe.prepTime + recipe.cookTime }}min</span>
+                </div>
+              </mat-card-header>
+
+              <!-- Recipe Content -->
+              <mat-card-content>
+                <p class="recipe-description">{{ recipe.description }}</p>
+
+                <!-- Expiring Ingredients Alert -->
+                @if (recipe.expiringIngredients && recipe.expiringIngredients.length > 0) {
+                  <div class="expiring-alert">
+                    <strong>⏰ À utiliser rapidement :</strong>
+                    <ul class="expiring-list">
+                      @for (exp of recipe.expiringIngredients; track exp.ingredientId) {
+                        <li>
+                          {{ exp.ingredientName }}
+                          <span class="expiry-days" [class.urgent]="exp.daysToExpiry === 1">
+                            ({{ exp.daysToExpiry === 1 ? "demain" : exp.daysToExpiry + " jours" }})
+                          </span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </mat-card-content>
+
+              <!-- Recipe Actions -->
+              <mat-card-actions>
+                <button mat-raised-button color="primary" (click)="viewRecipe(recipe)">
+                  <mat-icon>visibility</mat-icon>
+                  Voir la recette
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Recipes Non-Réalisables Section -->
+    @if ((filteredRecipes | filterByStatus: false).length > 0) {
+      <section class="recipes-section unavailable-section">
+        <div class="section-header">
+          <h2>❌ Recettes Non Réalisables</h2>
+          <span class="count-badge">{{ (filteredRecipes | filterByStatus: false).length }}</span>
+        </div>
+
+        <div class="recipes-grid">
+          @for (recipe of (filteredRecipes | filterByStatus: false); track recipe.id) {
+            <mat-card [class.recipe-card]="true" [class.disabled]="true">
+              <!-- Recipe Image (Grayed Out) -->
+              <div class="recipe-image disabled-overlay">
+                @if (recipe.image) {
+                  <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-photo" />
+                } @else {
+                  <div class="recipe-placeholder">
+                    <span class="placeholder-icon">📸</span>
+                  </div>
+                }
+                <div class="overlay-text">🔒 Ingrédients manquants</div>
+              </div>
+
+              <!-- Recipe Header -->
+              <mat-card-header>
+                <div class="header-top">
+                  <h3>{{ recipe.name }}</h3>
+                  <span class="category-badge">{{ recipe.category }}</span>
+                </div>
+                <div class="difficulty-time">
+                  <span class="difficulty" [class]="'difficulty-' + recipe.difficulty">
+                    {{ getDifficultyLabel(recipe.difficulty) }}
+                  </span>
+                  <span class="time">⏱️ {{ recipe.prepTime + recipe.cookTime }}min</span>
+                </div>
+              </mat-card-header>
+
+              <!-- Recipe Content -->
+              <mat-card-content>
+                <p class="recipe-description">{{ recipe.description }}</p>
+
+                <!-- Missing Ingredients Alert -->
+                @if (recipe.missingIngredients && recipe.missingIngredients.length > 0) {
+                  <div class="missing-alert">
+                    <strong>🛒 Ingrédients manquants :</strong>
+                    <ul class="missing-list">
+                      @for (missing of recipe.missingIngredients; track missing.ingredientId) {
+                        <li>
+                          <span class="ingredient-name">{{ missing.ingredientName }}</span>
+                          <span class="missing-qty">
+                            Manque : {{ missing.missing }} {{ missing.unit }}
+                          </span>
+                          <span class="available-qty">
+                            (Vous en avez : {{ missing.available }} {{ missing.unit }})
+                          </span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </mat-card-content>
+
+              <!-- Recipe Actions (Disabled) -->
+              <mat-card-actions>
+                <button mat-raised-button color="primary" (click)="viewRecipe(recipe)" disabled>
+                  <mat-icon>visibility</mat-icon>
+                  Voir la recette
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Empty State -->
+    @if (filteredRecipes.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h2>Aucune recette trouvée</h2>
+        <p>{{ searchQuery() ? 'Essayez une autre recherche' : 'Commencez par créer votre première recette !' }}</p>
+      </div>
+    }
+  </div>
 </div>

@@ -1,0 +1,140 @@
+<div class="recipe-detail-container">
+  @if (recipe) {
+    <div class="header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>{{ recipe.name }}</h1>
+      <span class="status-badge" [class]="'status-' + overallStatus">{{ overallStatus }}</span>
+    </div>
+
+    <mat-card class="recipe-card">
+      <mat-card-header>
+        @if (recipe.image) {
+          <img [src]="recipe.image" alt="{{ recipe.name }}" class="recipe-image" />
+        } @else {
+          <div class="recipe-placeholder">
+            <mat-icon>restaurant</mat-icon>
+          </div>
+        }
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="recipe-info">
+          <span class="info-item">📝 {{ recipe.category }}</span>
+          <span class="info-item">⏱️ Préparation: {{ recipe.prepTime }}min</span>
+          <span class="info-item">🔥 Cuisson: {{ recipe.cookTime }}min</span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Portions Selection -->
+        <div class="portions-section">
+          <h3>Portions</h3>
+          <div class="portions-input">
+            <button mat-icon-button (click)="portions = Math.max(1, portions - 1)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <input
+              type="number"
+              min="1"
+              [(ngModel)]="portions"
+              (change)="onPortionsChange()"
+              class="portions-input-field"
+            />
+            <button mat-icon-button (click)="portions = portions + 1">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Ingredients List -->
+        <div class="ingredients-section">
+          <h3>Ingrédients ({{ ingredientsWithStock.length }})</h3>
+          <div class="ingredients-list">
+            @for (ingredient of ingredientsWithStock; track ingredient.ingredientId) {
+              <div class="ingredient-item" [class]="'status-' + ingredient.status">
+                <div class="ingredient-header">
+                  <span class="ingredient-name">{{ ingredient.ingredientName }}</span>
+                  <span class="ingredient-status">{{ ingredient.status }}</span>
+                </div>
+
+                <div class="ingredient-quantities">
+                  <div class="quantity-row">
+                    <span class="label">Besoin:</span>
+                    <span class="value">{{ ingredient.quantity | number: '1.2-2' }} {{ ingredient.unit }}</span>
+                  </div>
+                  <div class="quantity-row">
+                    <span class="label">Disponible:</span>
+                    <span class="value" [class]="ingredient.available >= ingredient.quantity ? 'ok' : 'warning'">
+                      {{ ingredient.available | number: '1.2-2' }} {{ ingredient.unit }}
+                    </span>
+                  </div>
+                  @if (ingredient.missing > 0) {
+                    <div class="quantity-row missing">
+                      <span class="label">Manque:</span>
+                      <span class="value">{{ ingredient.missing | number: '1.2-2' }} {{ ingredient.unit }}</span>
+                      <button
+                        mat-button
+                        color="accent"
+                        (click)="addMissingToShoppingList(ingredient)"
+                        class="add-to-list-btn"
+                      >
+                        <mat-icon>add_shopping_cart</mat-icon>
+                        Ajouter
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Missing Items Section -->
+        @if (showMissingOptions && missingIngredientsCount > 0) {
+          <div class="missing-section alert-warning">
+            <h3>⚠️ {{ missingIngredientsCount }} ingrédient(s) manquant(s)</h3>
+            <p>Vous n'avez pas assez de tous les ingrédients pour cette recette.</p>
+            <div class="missing-actions">
+              <button mat-raised-button color="accent" (click)="addAllMissingToShoppingList()">
+                <mat-icon>add_shopping_cart</mat-icon>
+                Ajouter tous les manquants
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Recipes Steps -->
+        <div class="steps-section">
+          <h3>Étapes</h3>
+          <ol class="steps-list">
+            @for (step of recipe.steps; let i = $index; track i) {
+              <li class="step-item">{{ step }}</li>
+            }
+          </ol>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="makeRecipe()" [disabled]="overallStatus === '🔴' && missingIngredientsCount === recipe.ingredients.length">
+          <mat-icon>check_circle</mat-icon>
+          Réaliser la recette ({{ portions }} portion{{ portions > 1 ? 's' : '' }})
+        </button>
+        <button mat-button (click)="goBack()">
+          <mat-icon>close</mat-icon>
+          Annuler
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <div class="empty-state">
+      <p>Recette non trouvée</p>
+      <button mat-raised-button (click)="goBack()">Retour</button>
+    </div>
+  }
+</div>

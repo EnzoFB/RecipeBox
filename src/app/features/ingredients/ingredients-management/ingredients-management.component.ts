@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,10 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { takeUntil } from 'rxjs';
 import { Ingredient, INGREDIENT_CATEGORIES, Unit } from '../../../core/models';
 import { IngredientService, UnitService } from '../../../core/services';
+import { BaseCrudManagementComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-ingredients-management',
@@ -20,80 +22,91 @@ import { IngredientService, UnitService } from '../../../core/services';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatCardModule
+    MatCardModule,
+    MatTableModule,
+    MatSortModule
   ],
   templateUrl: './ingredients-management.component.html',
   styleUrl: './ingredients-management.component.scss'
 })
-export class IngredientsManagementComponent implements OnInit, OnDestroy {
-  ingredients = signal<Ingredient[]>([]);
-  searchQuery = signal('');
+export class IngredientsManagementComponent extends BaseCrudManagementComponent<Ingredient> implements OnInit {
+  displayedColumns: string[] = ['image', 'name', 'category', 'unit', 'calories', 'actions'];
   categories = INGREDIENT_CATEGORIES;
+
   private units: Map<number, Unit> = new Map();
-  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private readonly ingredientService: IngredientService,
     private readonly unitService: UnitService,
-    private readonly router: Router
-  ) {}
+    router: Router
+  ) {
+    super(router);
+  }
 
-  ngOnInit(): void {
-    this.unitService.getUnits()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(units => {
-        this.units = new Map(units.map(u => [u.id!, u]));
-      });
+  protected loadData(): void {
+    this.setLoading(true);
 
-    this.ingredientService.getIngredients()
+    // Load units first
+    this.unitService
+      .getUnits()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(ingredients => {
-        this.ingredients.set(ingredients);
+      .subscribe({
+        next: (units) => {
+          this.units = new Map(units.map(u => [u.id!, u]));
+          this.loadIngredients();
+        },
+        error: (error) => {
+          this.setError('Erreur lors du chargement des unités');
+          this.setLoading(false);
+          console.error('Error loading units:', error);
+        }
       });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  private loadIngredients(): void {
+    this.ingredientService
+      .getIngredients()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (ingredients) => {
+          this.setItems(ingredients);
+          this.setLoading(false);
+          this.clearError();
+        },
+        error: (error) => {
+          this.setError('Erreur lors du chargement des ingrédients');
+          this.setLoading(false);
+          console.error('Error loading ingredients:', error);
+        }
+      });
+  }
+
+  protected filter(ingredients: Ingredient[], query: string): Ingredient[] {
+    return ingredients.filter(ingredient => {
+      const name = ingredient.name?.toLowerCase() || '';
+      const category = ingredient.category?.toLowerCase() || '';
+      return name.includes(query) || category.includes(query);
+    });
   }
 
   openAddForm(): void {
-    this.router.navigate(['/ingredients/create']);
+    this.navigateToCreate('/ingredients/create');
   }
 
   openEditForm(ingredient: Ingredient): void {
-    this.router.navigate(['/ingredients', ingredient.id, 'edit']);
+    this.navigateToEdit('/ingredients', ingredient.id);
   }
 
-  onDeleteIngredient(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?')) {
+  onDeleteIngredient(id: number, name?: string): void {
+    if (this.confirmDeletion(name)) {
       this.ingredientService.deleteIngredient(id);
-      this.ingredients.update(ingredients => 
-        ingredients.filter(i => i.id !== id)
-      );
+      this.loadData();
     }
-  }
-
-  onSearch(): void {
-    // Le filtre est appliqué dans le getter
   }
 
   getUnitName(unitId?: number): string {
     if (!unitId) return '-';
     return this.units.get(unitId)?.symbol || '-';
   }
-
-  get filteredIngredients(): Ingredient[] {
-    const query = this.searchQuery().toLowerCase();
-
-    if (!query) {
-      return this.ingredients();
-    }
-
-    return this.ingredients().filter(ingredient => {
-      const name = ingredient.name?.toLowerCase() || '';
-      const category = ingredient.category?.toLowerCase() || '';
-      return name.includes(query) || category.includes(query);
-    });
-  }
 }
+

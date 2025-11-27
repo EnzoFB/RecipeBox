@@ -1,0 +1,147 @@
+.shopping-list-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 16px 0;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .total-items {
+    background-color: #f5f5f5;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+
+  p {
+    margin: 12px 0;
+    font-size: 16px;
+    color: #666;
+
+    &:first-child {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    small {
+      font-size: 14px;
+    }
+  }
+
+  button {
+    margin-top: 16px;
+  }
+}
+
+mat-tab-group {
+  margin-top: 24px;
+
+  .tab-content {
+    padding: 24px 16px;
+  }
+}
+
+.action-btn {
+  margin-bottom: 16px;
+}
+
+.shopping-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+
+  thead {
+    background-color: #f5f5f5;
+  }
+
+  th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #ddd;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+
+  tr:hover {
+    background-color: #fafafa;
+  }
+
+  .quantity-input,
+  .date-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 120px;
+
+    &:focus {
+      outline: none;
+      border-color: #1976d2;
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+    }
+  }
+
+  .recipe-badge {
+    display: inline-block;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  button {
+    margin: 0;
+  }
+}
+
+.buy-mode-info {
+  background-color: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+
+  p {
+    margin: 0;
+    color: #1565c0;
+    font-size: 14px;
+  }
+}
+
+.tab-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}

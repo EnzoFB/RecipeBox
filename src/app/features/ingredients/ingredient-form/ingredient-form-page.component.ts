@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -49,7 +49,8 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
     private readonly ingredientService: IngredientService,
     private readonly unitService: UnitService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.initializeForm();
   }
@@ -141,8 +142,13 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         const base64 = e.target?.result as string;
-        this.form.patchValue({ image: base64 });
-        this.imagePreview = base64;
+        if (base64) {
+          this.imagePreview = base64;
+          this.form.patchValue({ image: base64 });
+          this.form.get('image')?.markAsTouched();
+          // Force change detection
+          this.cdr.markForCheck();
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -150,7 +156,20 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
 
   removeImage(): void {
     this.form.patchValue({ image: '' });
+    this.form.get('image')?.markAsTouched();
     this.imagePreview = null;
+    // Réinitialiser l'input file avec l'ID unique
+    const fileInput = document.getElementById('imageFileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  changeImage(): void {
+    const imageInput = document.getElementById('imageFileInput') as HTMLInputElement;
+    if (imageInput) {
+      imageInput.click();
+    }
   }
 
   onSubmit(): void {
@@ -159,11 +178,12 @@ export class IngredientFormPageComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const imageValue = this.form.get('image')?.value;
     const formData: Omit<Ingredient, 'id'> = {
       name: this.form.get('name')?.value?.trim() || '',
       category: this.form.get('category')?.value || '',
       unitId: this.form.get('unitId')?.value || undefined,
-      image: this.form.get('image')?.value || undefined,
+      image: imageValue?.trim() ? imageValue : undefined,
       calories: this.form.get('calories')?.value || 0,
       protein: this.form.get('protein')?.value || 0,
       carbs: this.form.get('carbs')?.value || 0,

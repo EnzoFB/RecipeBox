@@ -107,32 +107,48 @@
           <div class="form-section image-section">
             <h3 class="section-title">🖼️ Photo</h3>
             <div class="image-upload-container">
+              <input
+                id="imageFileInput"
+                type="file"
+                accept="image/*"
+                (change)="onImageSelected($event)"
+                style="display: none"
+              />
               @if (imagePreview) {
                 <div class="image-preview">
                   <img [src]="imagePreview" alt="Aperçu de l'ingrédient" />
-                  <button
-                    type="button"
-                    mat-icon-button
-                    (click)="removeImage()"
-                    class="remove-btn"
-                    matTooltip="Supprimer l'image"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  <div class="image-actions">
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="changeImage()"
+                      class="change-btn"
+                      matTooltip="Changer l'image"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="removeImage()"
+                      class="remove-btn"
+                      matTooltip="Supprimer l'image"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </div>
               } @else {
-                <label class="upload-zone">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    (change)="onImageSelected($event)"
-                    style="display: none"
-                  />
+                <button 
+                  type="button"
+                  class="upload-zone" 
+                  (click)="changeImage()"
+                >
                   <div class="upload-icon">
                     <mat-icon>add_photo_alternate</mat-icon>
                     <p>Ajouter une photo</p>
                   </div>
-                </label>
+                </button>
               }
             </div>
           </div>

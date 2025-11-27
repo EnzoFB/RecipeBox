@@ -34,7 +34,7 @@
               <!-- Expiring Badge -->
               @if (recipe.hasExpiringIngredients) {
                 <div class="expiring-badge">
-                  ⏰ À utiliser rapidement
+                  ⏰ Expire bientôt
                 </div>
               }
 
@@ -70,7 +70,7 @@
                 <!-- Expiring Ingredients Alert -->
                 @if (recipe.expiringIngredients && recipe.expiringIngredients.length > 0) {
                   <div class="expiring-alert">
-                    <strong>⏰ À utiliser rapidement :</strong>
+                    <strong>⏰ Expire bientôt :</strong>
                     <ul class="expiring-list">
                       @for (exp of recipe.expiringIngredients; track exp.ingredientId) {
                         <li>

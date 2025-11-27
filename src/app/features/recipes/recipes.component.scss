@@ -292,6 +292,8 @@
       border-radius: 6px;
       padding: 0.6rem;
       font-size: 0.8rem;
+      max-height: 200px;
+      overflow-y: auto;
 
       strong {
         color: #721c24;

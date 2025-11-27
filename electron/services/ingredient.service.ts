@@ -37,12 +37,13 @@ export class IngredientService {
         }
 
         db.run(
-          `INSERT INTO ingredients (name, category, unitId, calories, protein, carbs, fat)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO ingredients (name, category, unitId, image, calories, protein, carbs, fat)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             ingredient.name,
             ingredient.category || 'Autre',
             ingredient.unitId || null,
+            ingredient.image || null,
             ingredient.calories || null,
             ingredient.protein || null,
             ingredient.carbs || null,
@@ -67,29 +68,50 @@ export class IngredientService {
     try {
       logger.debug(`Updating ingredient ${id}`);
       
-      await runAsync(
-        `UPDATE ingredients 
-         SET name = COALESCE(?, name),
-             category = COALESCE(?, category),
-             unitId = COALESCE(?, unitId),
-             calories = COALESCE(?, calories),
-             protein = COALESCE(?, protein),
-             carbs = COALESCE(?, carbs),
-             fat = COALESCE(?, fat),
-             updatedAt = CURRENT_TIMESTAMP
-         WHERE id = ?`,
-        [
-          ingredient.name || null,
-          ingredient.category || null,
-          ingredient.unitId || null,
-          ingredient.calories || null,
-          ingredient.protein || null,
-          ingredient.carbs || null,
-          ingredient.fat || null,
-          id
-        ]
-      );
+      // Construire dynamiquement la requête UPDATE en fonction des champs fournis
+      const updates: string[] = [];
+      const params: any[] = [];
 
+      if ('name' in ingredient) {
+        updates.push('name = ?');
+        params.push(ingredient.name || null);
+      }
+      if ('category' in ingredient) {
+        updates.push('category = ?');
+        params.push(ingredient.category || 'Autre');
+      }
+      if ('unitId' in ingredient) {
+        updates.push('unitId = ?');
+        params.push(ingredient.unitId || null);
+      }
+      if ('image' in ingredient) {
+        updates.push('image = ?');
+        params.push(ingredient.image || null); // Allow null to clear image
+      }
+      if ('calories' in ingredient) {
+        updates.push('calories = ?');
+        params.push(ingredient.calories || null);
+      }
+      if ('protein' in ingredient) {
+        updates.push('protein = ?');
+        params.push(ingredient.protein || null);
+      }
+      if ('carbs' in ingredient) {
+        updates.push('carbs = ?');
+        params.push(ingredient.carbs || null);
+      }
+      if ('fat' in ingredient) {
+        updates.push('fat = ?');
+        params.push(ingredient.fat || null);
+      }
+
+      // Always update timestamp
+      updates.push('updatedAt = CURRENT_TIMESTAMP');
+      params.push(id);
+
+      const sql = `UPDATE ingredients SET ${updates.join(', ')} WHERE id = ?`;
+
+      await runAsync(sql, params);
       logger.success(`Ingredient ${id} updated`);
     } catch (error) {
       logger.error(`Failed to update ingredient ${id}`, error);

@@ -32,7 +32,10 @@
         <div class="portions-section">
           <h3>Portions</h3>
           <div class="portions-input">
-            <button mat-icon-button (click)="portions = Math.max(1, portions - 1); onPortionsChange()">
+            <button
+              mat-icon-button
+              (click)="portions = Math.max(1, portions - 1); onPortionsChange()"
+            >
               <mat-icon>remove</mat-icon>
             </button>
             <input
@@ -64,18 +67,25 @@
                 <div class="ingredient-quantities">
                   <div class="quantity-row">
                     <span class="label">Besoin:</span>
-                    <span class="value">{{ ingredient.quantity | number: '1.2-2' }} {{ ingredient.unit }}</span>
+                    <span class="value"
+                      >{{ ingredient.quantity | number: '1.2-2' }} {{ ingredient.unit }}</span
+                    >
                   </div>
                   <div class="quantity-row">
                     <span class="label">Disponible:</span>
-                    <span class="value" [class]="ingredient.available >= ingredient.quantity ? 'ok' : 'warning'">
+                    <span
+                      class="value"
+                      [class]="ingredient.available >= ingredient.quantity ? 'ok' : 'warning'"
+                    >
                       {{ ingredient.available | number: '1.2-2' }} {{ ingredient.unit }}
                     </span>
                   </div>
                   @if (ingredient.missing > 0) {
                     <div class="quantity-row missing">
                       <span class="label">Manque:</span>
-                      <span class="value">{{ ingredient.missing | number: '1.2-2' }} {{ ingredient.unit }}</span>
+                      <span class="value"
+                        >{{ ingredient.missing | number: '1.2-2' }} {{ ingredient.unit }}</span
+                      >
                       <button
                         mat-button
                         color="accent"
@@ -121,11 +131,13 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <button 
-          mat-raised-button 
-          color="primary" 
-          (click)="makeRecipe()" 
-          [disabled]="overallStatus === '🔴' && missingIngredientsCount === recipe.ingredients.length"
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="makeRecipe()"
+          [disabled]="
+            overallStatus === '🔴' && missingIngredientsCount === recipe.ingredients.length
+          "
         >
           <mat-icon>check_circle</mat-icon>
           Réaliser la recette ({{ portions }} portion{{ portions > 1 ? 's' : '' }})

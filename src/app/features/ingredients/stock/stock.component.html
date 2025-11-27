@@ -5,7 +5,12 @@
       <p class="subtitle">Gérez vos ingrédients en stock</p>
     </div>
     <div class="header-actions">
-      <mat-button-toggle-group [(value)]="viewMode" (change)="onViewModeChange($event)" appearance="standard" [hideSingleSelectionIndicator]="true">
+      <mat-button-toggle-group
+        [(value)]="viewMode"
+        (change)="onViewModeChange($event)"
+        appearance="standard"
+        [hideSingleSelectionIndicator]="true"
+      >
         <mat-button-toggle value="cards" matTooltip="Affichage cartes">
           <mat-icon>dashboard</mat-icon>
         </mat-button-toggle>
@@ -32,9 +37,7 @@
       <!-- CARDS VIEW BY CATEGORY -->
       <mat-tab-group>
         <mat-tab>
-          <ng-template mat-tab-label>
-            Tout ({{ stock().length }})
-          </ng-template>
+          <ng-template mat-tab-label> Tout ({{ stock().length }}) </ng-template>
           <div class="tabs-content">
             <div class="stock-grid">
               @for (item of stock(); track item.id) {
@@ -100,7 +103,12 @@
                     <button mat-icon-button matTooltip="Modifier" (click)="openEditForm(item)">
                       <mat-icon>edit</mat-icon>
                     </button>
-                    <button mat-icon-button matTooltip="Supprimer" color="warn" (click)="onDeleteStock(item.id)">
+                    <button
+                      mat-icon-button
+                      matTooltip="Supprimer"
+                      color="warn"
+                      (click)="onDeleteStock(item.id)"
+                    >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
@@ -173,13 +181,22 @@
                     </div>
 
                     <div class="card-actions">
-                      <button mat-icon-button matTooltip="Dupliquer" (click)="onDuplicateStock(item)">
+                      <button
+                        mat-icon-button
+                        matTooltip="Dupliquer"
+                        (click)="onDuplicateStock(item)"
+                      >
                         <mat-icon>content_copy</mat-icon>
                       </button>
                       <button mat-icon-button matTooltip="Modifier" (click)="openEditForm(item)">
                         <mat-icon>edit</mat-icon>
                       </button>
-                      <button mat-icon-button matTooltip="Supprimer" color="warn" (click)="onDeleteStock(item.id)">
+                      <button
+                        mat-icon-button
+                        matTooltip="Supprimer"
+                        color="warn"
+                        (click)="onDeleteStock(item.id)"
+                      >
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>
@@ -197,7 +214,11 @@
             <th mat-header-cell *matHeaderCellDef>Image</th>
             <td mat-cell *matCellDef="let item" class="image-cell">
               @if (getIngredientImage(item.ingredientId); as image) {
-                <img [src]="image" [alt]="getIngredientName(item.ingredientId)" class="stock-thumb" />
+                <img
+                  [src]="image"
+                  [alt]="getIngredientName(item.ingredientId)"
+                  class="stock-thumb"
+                />
               } @else {
                 <div class="stock-thumb-placeholder"><span class="placeholder-icon">📦</span></div>
               }
@@ -211,7 +232,9 @@
 
           <ng-container matColumnDef="category">
             <th mat-header-cell *matHeaderCellDef>Catégorie</th>
-            <td mat-cell *matCellDef="let item"><span class="category-badge">{{ item.category }}</span></td>
+            <td mat-cell *matCellDef="let item">
+              <span class="category-badge">{{ item.category }}</span>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="quantity">
@@ -221,7 +244,9 @@
 
           <ng-container matColumnDef="expiry">
             <th mat-header-cell *matHeaderCellDef>Expiration</th>
-            <td mat-cell *matCellDef="let item" [ngClass]="{ 'expired-text': item.isExpired }">{{ item.expiryDate }}</td>
+            <td mat-cell *matCellDef="let item" [ngClass]="{ 'expired-text': item.isExpired }">
+              {{ item.expiryDate }}
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="status">
@@ -250,14 +275,19 @@
               <button mat-icon-button matTooltip="Modifier" (click)="openEditForm(item)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button matTooltip="Supprimer" color="warn" (click)="onDeleteStock(item.id)">
+              <button
+                mat-icon-button
+                matTooltip="Supprimer"
+                color="warn"
+                (click)="onDeleteStock(item.id)"
+              >
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="stock-row"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="stock-row"></tr>
         </table>
       </div>
     }

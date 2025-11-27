@@ -1,262 +1,276 @@
-  @if (isLoading()) {
-    <div class="loading-container">
-      <mat-spinner diameter="50"></mat-spinner>
+@if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+} @else {
+  <div class="page-header">
+    <button mat-icon-button class="back-button" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1>{{ isEditMode() ? 'Modifier la recette' : 'Créer une nouvelle recette' }}</h1>
+      <p class="subtitle">Remplissez les informations ci-dessous</p>
     </div>
-  } @else {
-    <div class="page-header">
-      <button mat-icon-button class="back-button" (click)="onCancel()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <div class="header-content">
-        <h1>{{ isEditMode() ? 'Modifier la recette' : 'Créer une nouvelle recette' }}</h1>
-        <p class="subtitle">Remplissez les informations ci-dessous</p>
-      </div>
-    </div>
+  </div>
 
-    <div class="form-container">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-layout">
-          <!-- Colonne gauche -->
-          <div class="form-column-left">
-            <!-- Informations générales -->
-            <div class="form-section">
-              <h3 class="section-title">📋 Informations générales</h3>
-              <div class="form-fields">
+  <div class="form-container">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-layout">
+        <!-- Colonne gauche -->
+        <div class="form-column-left">
+          <!-- Informations générales -->
+          <div class="form-section">
+            <h3 class="section-title">📋 Informations générales</h3>
+            <div class="form-fields">
+              <mat-form-field appearance="outline">
+                <mat-label>Nom de la recette</mat-label>
+                <input matInput formControlName="name" placeholder="ex: Salade César" />
+                <mat-hint>Donnez un nom unique et descriptif</mat-hint>
+                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                  <mat-error>Le nom est requis</mat-error>
+                }
+                @if (form.get('name')?.hasError('minlength')) {
+                  <mat-error>Minimum 3 caractères requis</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <textarea
+                  matInput
+                  formControlName="description"
+                  placeholder="Décrivez votre recette en quelques mots..."
+                  rows="3"
+                ></textarea>
+                <mat-hint>Brève description de la recette</mat-hint>
+                @if (
+                  form.get('description')?.hasError('required') && form.get('description')?.touched
+                ) {
+                  <mat-error>La description est requise</mat-error>
+                }
+              </mat-form-field>
+
+              <div class="form-row">
                 <mat-form-field appearance="outline">
-                  <mat-label>Nom de la recette</mat-label>
-                  <input matInput formControlName="name" placeholder="ex: Salade César" />
-                  <mat-hint>Donnez un nom unique et descriptif</mat-hint>
-                  @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-                    <mat-error>Le nom est requis</mat-error>
-                  }
-                  @if (form.get('name')?.hasError('minlength')) {
-                    <mat-error>Minimum 3 caractères requis</mat-error>
+                  <mat-label>Catégorie</mat-label>
+                  <mat-select formControlName="category">
+                    @for (category of recipeCategories; track category) {
+                      <mat-option [value]="category">{{ category }}</mat-option>
+                    }
+                  </mat-select>
+                  @if (
+                    form.get('category')?.hasError('required') && form.get('category')?.touched
+                  ) {
+                    <mat-error>La catégorie est requise</mat-error>
                   }
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Description</mat-label>
-                  <textarea
-                    matInput
-                    formControlName="description"
-                    placeholder="Décrivez votre recette en quelques mots..."
-                    rows="3"
-                  ></textarea>
-                  <mat-hint>Brève description de la recette</mat-hint>
-                  @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
-                    <mat-error>La description est requise</mat-error>
+                  <mat-label>Difficulté</mat-label>
+                  <mat-select formControlName="difficulty">
+                    @for (level of difficultyLevels; track level) {
+                      <mat-option [value]="level">{{ difficultyLabels[level] }}</mat-option>
+                    }
+                  </mat-select>
+                  @if (
+                    form.get('difficulty')?.hasError('required') && form.get('difficulty')?.touched
+                  ) {
+                    <mat-error>La difficulté est requise</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Temps de préparation (min)</mat-label>
+                  <input matInput type="number" formControlName="prepTime" min="0" />
+                  @if (form.get('prepTime')?.hasError('required')) {
+                    <mat-error>Requis</mat-error>
                   }
                 </mat-form-field>
 
-                <div class="form-row">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Catégorie</mat-label>
-                    <mat-select formControlName="category">
-                      @for (category of recipeCategories; track category) {
-                        <mat-option [value]="category">{{ category }}</mat-option>
-                      }
-                    </mat-select>
-                    @if (form.get('category')?.hasError('required') && form.get('category')?.touched) {
-                      <mat-error>La catégorie est requise</mat-error>
-                    }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                    <mat-label>Difficulté</mat-label>
-                    <mat-select formControlName="difficulty">
-                      @for (level of difficultyLevels; track level) {
-                        <mat-option [value]="level">{{ difficultyLabels[level] }}</mat-option>
-                      }
-                    </mat-select>
-                    @if (form.get('difficulty')?.hasError('required') && form.get('difficulty')?.touched) {
-                      <mat-error>La difficulté est requise</mat-error>
-                    }
-                  </mat-form-field>
-                </div>
-
-                <div class="form-row">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Temps de préparation (min)</mat-label>
-                    <input matInput type="number" formControlName="prepTime" min="0" />
-                    @if (form.get('prepTime')?.hasError('required')) {
-                      <mat-error>Requis</mat-error>
-                    }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                    <mat-label>Temps de cuisson (min)</mat-label>
-                    <input matInput type="number" formControlName="cookTime" min="0" />
-                    @if (form.get('cookTime')?.hasError('required')) {
-                      <mat-error>Requis</mat-error>
-                    }
-                  </mat-form-field>
-                </div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Temps de cuisson (min)</mat-label>
+                  <input matInput type="number" formControlName="cookTime" min="0" />
+                  @if (form.get('cookTime')?.hasError('required')) {
+                    <mat-error>Requis</mat-error>
+                  }
+                </mat-form-field>
               </div>
             </div>
+          </div>
 
-            <!-- Ingrédients -->
-            <div class="form-section">
-              <h3 class="section-title">🥘 Liste des ingrédients</h3>
-              <div class="ingredients-input">
+          <!-- Ingrédients -->
+          <div class="form-section">
+            <h3 class="section-title">🥘 Liste des ingrédients</h3>
+            <div class="ingredients-input">
+              <mat-form-field appearance="outline">
+                <mat-label>Ingrédient</mat-label>
+                <mat-select formControlName="ingredientId">
+                  @for (ingredient of availableIngredients(); track ingredient.id) {
+                    <mat-option [value]="ingredient.id">{{ ingredient.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <div class="quantity-group">
                 <mat-form-field appearance="outline">
-                  <mat-label>Ingrédient</mat-label>
-                  <mat-select formControlName="ingredientId">
-                    @for (ingredient of availableIngredients(); track ingredient.id) {
-                      <mat-option [value]="ingredient.id">{{ ingredient.name }}</mat-option>
+                  <mat-label>Quantité</mat-label>
+                  <input matInput type="number" formControlName="quantity" min="0.1" step="0.1" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Unité</mat-label>
+                  <mat-select formControlName="unit">
+                    @for (unit of availableUnits; track unit) {
+                      <mat-option [value]="unit">{{ unit }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
-                
-                <div class="quantity-group">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Quantité</mat-label>
-                    <input matInput type="number" formControlName="quantity" min="0.1" step="0.1" />
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Unité</mat-label>
-                    <mat-select formControlName="unit">
-                      @for (unit of availableUnits; track unit) {
-                        <mat-option [value]="unit">{{ unit }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-
-                <button
-                  type="button"
-                  mat-raised-button
-                  color="accent"
-                  (click)="addIngredient()"
-                  [disabled]="!isIngredientFieldsValid()"
-                  matTooltip="Ajouter"
-                  class="add-btn"
-                >
-                  <mat-icon>add</mat-icon>
-                </button>
               </div>
 
-              @if (selectedIngredients().length > 0) {
-                <div class="ingredients-list">
-                  @for (ingredient of selectedIngredients(); track ingredient.ingredientId) {
-                    <div class="ingredient-chip">
-                      <span>{{ getIngredientName(ingredient.ingredientId) }} - {{ ingredient.quantity }}{{ ingredient.unit }}</span>
-                      <button
-                        type="button"
-                        mat-icon-button
-                        (click)="removeIngredient(ingredient.ingredientId)"
-                        matTooltip="Retirer"
-                      >
-                        <mat-icon>close</mat-icon>
-                      </button>
-                    </div>
-                  }
+              <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="addIngredient()"
+                [disabled]="!isIngredientFieldsValid()"
+                matTooltip="Ajouter"
+                class="add-btn"
+              >
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            @if (selectedIngredients().length > 0) {
+              <div class="ingredients-list">
+                @for (ingredient of selectedIngredients(); track ingredient.ingredientId) {
+                  <div class="ingredient-chip">
+                    <span
+                      >{{ getIngredientName(ingredient.ingredientId) }} - {{ ingredient.quantity
+                      }}{{ ingredient.unit }}</span
+                    >
+                    <button
+                      type="button"
+                      mat-icon-button
+                      (click)="removeIngredient(ingredient.ingredientId)"
+                      matTooltip="Retirer"
+                    >
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="empty-message">Aucun ingrédient ajouté</p>
+            }
+          </div>
+        </div>
+
+        <!-- Colonne droite -->
+        <div class="form-column-right">
+          <!-- Image -->
+          <div class="form-section image-section">
+            <h3 class="section-title">🖼️ Photo</h3>
+            <div class="image-upload-container">
+              @if (imagePreview()) {
+                <div class="image-preview">
+                  <img [src]="imagePreview()" alt="Aperçu de la recette" />
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="removeImage()"
+                    class="remove-btn"
+                    matTooltip="Supprimer l'image"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 </div>
               } @else {
-                <p class="empty-message">Aucun ingrédient ajouté</p>
+                <label class="upload-zone">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    (change)="onImageSelected($event)"
+                    style="display: none"
+                  />
+                  <div class="upload-icon">
+                    <mat-icon>add_photo_alternate</mat-icon>
+                    <p>Ajouter une photo</p>
+                  </div>
+                </label>
               }
             </div>
           </div>
 
-          <!-- Colonne droite -->
-          <div class="form-column-right">
-            <!-- Image -->
-            <div class="form-section image-section">
-              <h3 class="section-title">🖼️ Photo</h3>
-              <div class="image-upload-container">
-                @if (imagePreview()) {
-                  <div class="image-preview">
-                    <img [src]="imagePreview()" alt="Aperçu de la recette" />
+          <!-- Étapes -->
+          <div class="form-section steps-section">
+            <h3 class="section-title">👨‍🍳 Étapes de préparation</h3>
+            <div class="steps-input">
+              <mat-form-field appearance="outline">
+                <mat-label>Nouvelle étape</mat-label>
+                <textarea
+                  matInput
+                  [(ngModel)]="newStep"
+                  [ngModelOptions]="{ standalone: true }"
+                  placeholder="Décrivez l'étape..."
+                  rows="2"
+                ></textarea>
+              </mat-form-field>
+              <button
+                type="button"
+                mat-raised-button
+                color="accent"
+                (click)="addStep()"
+                [disabled]="!canAddStep()"
+                matTooltip="Ajouter cette étape"
+                class="add-step-btn"
+              >
+                <mat-icon>add</mat-icon>
+                Ajouter
+              </button>
+            </div>
+
+            @if (steps().length > 0) {
+              <div class="steps-list" cdkDropList (cdkDropListDropped)="dropStep($event)">
+                @for (step of steps(); track $index; let i = $index) {
+                  <div class="step-item" cdkDrag>
+                    <mat-icon
+                      class="drag-handle"
+                      cdkDragHandle
+                      matTooltip="Glisser pour réorganiser"
+                      >drag_indicator</mat-icon
+                    >
+                    <span class="step-number">{{ i + 1 }}.</span>
+                    <span class="step-text">{{ step }}</span>
                     <button
                       type="button"
                       mat-icon-button
-                      (click)="removeImage()"
-                      class="remove-btn"
-                      matTooltip="Supprimer l'image"
+                      (click)="removeStep(i)"
+                      matTooltip="Supprimer"
                     >
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
-                } @else {
-                  <label class="upload-zone">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      (change)="onImageSelected($event)"
-                      style="display: none"
-                    />
-                    <div class="upload-icon">
-                      <mat-icon>add_photo_alternate</mat-icon>
-                      <p>Ajouter une photo</p>
-                    </div>
-                  </label>
                 }
               </div>
-            </div>
-
-            <!-- Étapes -->
-            <div class="form-section steps-section">
-              <h3 class="section-title">👨‍🍳 Étapes de préparation</h3>
-              <div class="steps-input">
-                <mat-form-field appearance="outline">
-                  <mat-label>Nouvelle étape</mat-label>
-                  <textarea
-                    matInput
-                    [(ngModel)]="newStep"
-                    [ngModelOptions]="{ standalone: true }"
-                    placeholder="Décrivez l'étape..."
-                    rows="2"
-                  ></textarea>
-                </mat-form-field>
-                <button
-                  type="button"
-                  mat-raised-button
-                  color="accent"
-                  (click)="addStep()"
-                  [disabled]="!canAddStep()"
-                  matTooltip="Ajouter cette étape"
-                  class="add-step-btn"
-                >
-                  <mat-icon>add</mat-icon>
-                  Ajouter
-                </button>
-              </div>
-
-              @if (steps().length > 0) {
-                <div class="steps-list" cdkDropList (cdkDropListDropped)="dropStep($event)">
-                  @for (step of steps(); track $index; let i = $index) {
-                    <div class="step-item" cdkDrag>
-                      <mat-icon class="drag-handle" cdkDragHandle matTooltip="Glisser pour réorganiser">drag_indicator</mat-icon>
-                      <span class="step-number">{{ i + 1 }}.</span>
-                      <span class="step-text">{{ step }}</span>
-                      <button
-                        type="button"
-                        mat-icon-button
-                        (click)="removeStep(i)"
-                        matTooltip="Supprimer"
-                      >
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <p class="empty-message">Aucune étape ajoutée</p>
-              }
-            </div>
+            } @else {
+              <p class="empty-message">Aucune étape ajoutée</p>
+            }
           </div>
         </div>
-
-          <!-- Actions -->
-          <div class="form-actions">
-            <button type="button" mat-stroked-button (click)="onCancel()">
-              <mat-icon>cancel</mat-icon>
-              Annuler
-            </button>
-            <button type="submit" mat-raised-button color="primary" [disabled]="!isFormValid()">
-              <mat-icon>{{ isEditMode() ? 'edit' : 'add_circle' }}</mat-icon>
-              {{ isEditMode() ? 'Modifier' : 'Créer' }}
-            </button>
-          </div>
-        </form>
       </div>
-  }
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" mat-stroked-button (click)="onCancel()">
+          <mat-icon>cancel</mat-icon>
+          Annuler
+        </button>
+        <button type="submit" mat-raised-button color="primary" [disabled]="!isFormValid()">
+          <mat-icon>{{ isEditMode() ? 'edit' : 'add_circle' }}</mat-icon>
+          {{ isEditMode() ? 'Modifier' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

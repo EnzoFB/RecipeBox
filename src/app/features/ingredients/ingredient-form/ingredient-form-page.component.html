@@ -42,7 +42,9 @@
                       <mat-option [value]="cat">{{ cat }}</mat-option>
                     }
                   </mat-select>
-                  @if (form.get('category')?.hasError('required') && form.get('category')?.touched) {
+                  @if (
+                    form.get('category')?.hasError('required') && form.get('category')?.touched
+                  ) {
                     <mat-error>La catégorie est requise</mat-error>
                   }
                 </mat-form-field>
@@ -139,11 +141,7 @@
                   </div>
                 </div>
               } @else {
-                <button 
-                  type="button"
-                  class="upload-zone" 
-                  (click)="changeImage()"
-                >
+                <button type="button" class="upload-zone" (click)="changeImage()">
                   <div class="upload-icon">
                     <mat-icon>add_photo_alternate</mat-icon>
                     <p>Ajouter une photo</p>

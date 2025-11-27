@@ -29,13 +29,14 @@
         </div>
 
         <div class="recipes-grid">
-          @for (recipe of (filteredRecipes | filterByStatus: true) | sliceByExpiry; track recipe.id) {
-            <mat-card [class.recipe-card]="true" [class.has-expiring]="recipe.hasExpiringIngredients">
+          @for (recipe of filteredRecipes | filterByStatus: true | sliceByExpiry; track recipe.id) {
+            <mat-card
+              [class.recipe-card]="true"
+              [class.has-expiring]="recipe.hasExpiringIngredients"
+            >
               <!-- Expiring Badge -->
               @if (recipe.hasExpiringIngredients) {
-                <div class="expiring-badge">
-                  ⏰ Expire bientôt
-                </div>
+                <div class="expiring-badge">⏰ Expire bientôt</div>
               }
 
               <!-- Recipe Image -->
@@ -76,7 +77,7 @@
                         <li>
                           {{ exp.ingredientName }}
                           <span class="expiry-days" [class.urgent]="exp.daysToExpiry === 1">
-                            ({{ exp.daysToExpiry === 1 ? "demain" : exp.daysToExpiry + " jours" }})
+                            ({{ exp.daysToExpiry === 1 ? 'demain' : exp.daysToExpiry + ' jours' }})
                           </span>
                         </li>
                       }
@@ -85,7 +86,7 @@
                 }
               </mat-card-content>
 
-              <!-- Recipe Actions --> 
+              <!-- Recipe Actions -->
               <mat-card-actions>
                 <button mat-raised-button color="primary" (click)="viewRecipe(recipe)">
                   <mat-icon>visibility</mat-icon>
@@ -107,7 +108,7 @@
         </div>
 
         <div class="recipes-grid">
-          @for (recipe of (filteredRecipes | filterByStatus: false); track recipe.id) {
+          @for (recipe of filteredRecipes | filterByStatus: false; track recipe.id) {
             <mat-card [class.recipe-card]="true" [class.disabled]="true">
               <!-- Recipe Image (Grayed Out) -->
               <div class="recipe-image disabled-overlay">
@@ -178,7 +179,13 @@
       <div class="empty-state">
         <div class="empty-icon">📭</div>
         <h2>Aucune recette trouvée</h2>
-        <p>{{ searchQuery() ? 'Essayez une autre recherche' : 'Commencez par créer votre première recette !' }}</p>
+        <p>
+          {{
+            searchQuery()
+              ? 'Essayez une autre recherche'
+              : 'Commencez par créer votre première recette !'
+          }}
+        </p>
       </div>
     }
   </div>

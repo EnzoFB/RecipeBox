@@ -18,7 +18,11 @@
         <span matListItemTitle>Mon Stock</span>
       </button>
 
-      <button mat-list-item (click)="navigateTo('shopping-list')" [class.active]="isActive('shopping-list')">
+      <button
+        mat-list-item
+        (click)="navigateTo('shopping-list')"
+        [class.active]="isActive('shopping-list')"
+      >
         <mat-icon matListItemIcon>shopping_cart</mat-icon>
         <span matListItemTitle>Liste de Courses</span>
       </button>

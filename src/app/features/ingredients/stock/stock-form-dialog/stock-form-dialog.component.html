@@ -33,12 +33,7 @@
 
 <div mat-dialog-actions class="dialog-actions">
   <button mat-button (click)="onCancel()">Annuler</button>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="onSubmit()"
-    [disabled]="!form.valid"
-  >
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!form.valid">
     {{ isEditMode ? 'Modifier' : 'Ajouter' }}
   </button>
 </div>

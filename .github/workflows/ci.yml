@@ -23,3 +23,6 @@ jobs:
 
       - name: Run HTML Linter
         run: npm run lint:html
+
+      - name: Run Angular Linter
+        run: npm run lint:angular

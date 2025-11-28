@@ -13,8 +13,11 @@
     "test:ci": "ng test --watch=false --configuration=ci",
     "lint:html": "htmlhint src/**/*.html",
     "lint:html:fix": "prettier --write src/**/*.html",
+    "lint:angular": "ng lint",
+    "lint:angular:fix": "ng lint --fix",
     "package": "npm run build && npm run build:electron && electron-forge package",
-    "make": "npm run build && npm run build:electron && electron-forge make"
+    "make": "npm run build && npm run build:electron && electron-forge make",
+    "lint": "ng lint"
   },
   "prettier": {
     "printWidth": 100,
@@ -47,6 +50,11 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^21.0.0",
+    "@angular-eslint/builder": "21.0.1",
+    "@angular-eslint/eslint-plugin": "21.0.1",
+    "@angular-eslint/eslint-plugin-template": "21.0.1",
+    "@angular-eslint/schematics": "21.0.1",
+    "@angular-eslint/template-parser": "21.0.1",
     "@angular/build": "^21.0.0",
     "@angular/cli": "^21.0.0",
     "@angular/compiler-cli": "^21.0.0",
@@ -59,8 +67,12 @@
     "@electron-forge/plugin-fuses": "^7.10.2",
     "@electron/fuses": "^1.8.0",
     "@types/jasmine": "^5.1.13",
+    "@typescript-eslint/eslint-plugin": "7.11.0",
+    "@typescript-eslint/parser": "7.11.0",
+    "angular-eslint": "^21.0.1",
     "electron": "^39.2.3",
     "electron-reloader": "^1.2.3",
+    "eslint": "8.57.1",
     "htmlhint": "^1.8.0",
     "jasmine-core": "^5.12.1",
     "karma": "^6.4.4",

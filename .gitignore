@@ -110,3 +110,7 @@ desktop.ini
 .angular/
 
 documentations/
+
+electron-dist/
+browser-dist/
+dist-prep/

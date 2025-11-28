@@ -133,13 +133,17 @@ export class RecipeFormPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  onImageSelected(event: any): void {
-    const file = event.target.files[0];
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imageBase64.set(e.target.result);
-        this.imagePreview.set(e.target.result);
+      reader.onload = (loadEvent: ProgressEvent<FileReader>) => {
+        const result = loadEvent.target?.result as string | null;
+        if (result) {
+          this.imageBase64.set(result);
+          this.imagePreview.set(result);
+        }
       };
       reader.readAsDataURL(file);
     }

@@ -36,7 +36,7 @@ export class StockComponent implements OnInit {
   availableIngredients = signal<Ingredient[]>([]);
   viewMode = signal<'cards' | 'table'>('cards');
   displayedColumns = ['image', 'name', 'category', 'quantity', 'expiry', 'status', 'actions'];
-  private currentDialog: any = null;
+  private currentDialog: ReturnType<typeof MatDialog.prototype.open> | null = null;
 
   constructor(
     private readonly stockService: IngredientStockService,
@@ -46,7 +46,7 @@ export class StockComponent implements OnInit {
 
   ngOnInit(): void {
     // Load stock
-    this.stockService.getStock().subscribe((stockItems: IngredientStock[]) => {
+    this.stockService.getStock().subscribe(() => {
       this.stock.set(this.stockService.getStockWithExpiry());
     });
 
@@ -60,9 +60,9 @@ export class StockComponent implements OnInit {
     this.dialog.open(StockFormDialogComponent, {
       width: '500px',
       data: { item: null, ingredients: this.availableIngredients() }
-    }).afterClosed().subscribe((result: any) => {
-      if (result) {
-        this.stockService.addStock(result);
+    }).afterClosed().subscribe((result: unknown) => {
+      if (result && typeof result === 'object' && 'ingredientId' in result) {
+        this.stockService.addStock(result as IngredientStock);
         this.stock.set(this.stockService.getStockWithExpiry());
       }
     });
@@ -74,10 +74,10 @@ export class StockComponent implements OnInit {
       data: { item, ingredients: this.availableIngredients() }
     });
 
-    this.currentDialog.afterClosed().subscribe((result: any) => {
+    this.currentDialog.afterClosed().subscribe((result: unknown) => {
       this.currentDialog = null;
-      if (result) {
-        this.stockService.updateStock(item.id!, result);
+      if (result && typeof result === 'object' && 'ingredientId' in result) {
+        this.stockService.updateStock(item.id!, result as IngredientStock);
         this.stock.set(this.stockService.getStockWithExpiry());
       }
     });
@@ -128,7 +128,7 @@ export class StockComponent implements OnInit {
     return '';
   }
 
-  onViewModeChange(event: any): void {
+  onViewModeChange(event: { value: 'cards' | 'table' }): void {
     this.viewMode.set(event.value);
   }
 

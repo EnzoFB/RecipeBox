@@ -11,11 +11,35 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { Recipe } from '../../core/models';
+import { Ingredient } from '../../core/models/ingredient.model';
 import { RecipeService, IngredientService } from '../../core/services';
 import { IngredientStockService } from '../../core/services/ingredient-stock.service';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
 import { ShoppingListItem } from '../../core/models/shopping-list.model';
 import { CartModalComponent } from './cart-modal/cart-modal.component';
+
+// Types pour les pipes
+interface ExpiringIngredient {
+  ingredientId: number;
+  ingredientName: string;
+  daysToExpiry: number;
+}
+
+interface MissingIngredient {
+  ingredientId: number;
+  ingredientName: string;
+  quantity: number;
+  unit: string;
+  available: number;
+  missing: number;
+}
+
+interface RecipeWithStatus extends Recipe {
+  isReady: boolean;
+  hasExpiringIngredients: boolean;
+  expiringIngredients: ExpiringIngredient[];
+  missingIngredients: MissingIngredient[];
+}
 
 // Pipes
 @Pipe({
@@ -23,7 +47,7 @@ import { CartModalComponent } from './cart-modal/cart-modal.component';
   standalone: true
 })
 export class FilterByStatusPipe implements PipeTransform {
-  transform(recipes: any[], isReady: boolean): any[] {
+  transform(recipes: RecipeWithStatus[], isReady: boolean): RecipeWithStatus[] {
     return recipes.filter(recipe => recipe.isReady === isReady);
   }
 }
@@ -33,7 +57,7 @@ export class FilterByStatusPipe implements PipeTransform {
   standalone: true
 })
 export class SliceByExpiryPipe implements PipeTransform {
-  transform(recipes: any[]): any[] {
+  transform(recipes: RecipeWithStatus[]): RecipeWithStatus[] {
     // Trier pour mettre les recettes avec ingrédients bientôt périmés en premier
     return [...recipes].sort((a, b) => {
       if (a.hasExpiringIngredients && !b.hasExpiringIngredients) return -1;
@@ -41,21 +65,14 @@ export class SliceByExpiryPipe implements PipeTransform {
       
       // Si les deux ont des ingrédients bientôt périmés, mettre les plus urgents en premier
       if (a.hasExpiringIngredients && b.hasExpiringIngredients) {
-        const minDaysA = Math.min(...a.expiringIngredients.map((e: any) => e.daysToExpiry));
-        const minDaysB = Math.min(...b.expiringIngredients.map((e: any) => e.daysToExpiry));
+        const minDaysA = Math.min(...a.expiringIngredients.map((e: ExpiringIngredient) => e.daysToExpiry));
+        const minDaysB = Math.min(...b.expiringIngredients.map((e: ExpiringIngredient) => e.daysToExpiry));
         return minDaysA - minDaysB;
       }
       
       return 0;
     });
   }
-}
-
-interface RecipeWithStatus extends Recipe {
-  isReady: boolean;
-  hasExpiringIngredients: boolean;
-  expiringIngredients: Array<{ ingredientId: number; ingredientName: string; daysToExpiry: number }>;
-  missingIngredients: Array<{ ingredientId: number; ingredientName: string; quantity: number; unit: string; available: number; missing: number }>;
 }
 
 @Component({
@@ -80,7 +97,7 @@ interface RecipeWithStatus extends Recipe {
 export class RecipesComponent implements OnInit {
   recipes = signal<RecipeWithStatus[]>([]);
   searchQuery = signal('');
-  ingredients = signal<any[]>([]);
+  ingredients = signal<Ingredient[]>([]);
 
   constructor(
     private readonly recipeService: RecipeService,
@@ -191,15 +208,15 @@ export class RecipesComponent implements OnInit {
     );
   }
 
-  getDifficultyLabel(difficulty: any): string {
-    const labels: any = {
+  getDifficultyLabel(difficulty: string | number | undefined): string {
+    const labels: Record<string | number, string> = {
       1: 'Très facile',
       2: 'Facile',
       3: 'Moyen',
       4: 'Difficile',
       5: 'Très difficile'
     };
-    return labels[difficulty] || 'Moyen';
+    return (difficulty && labels[difficulty]) || 'Moyen';
   }
 
   openCartModal(recipe: RecipeWithStatus): void {

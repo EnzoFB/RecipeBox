@@ -13,17 +13,19 @@ export class UnitService {
   }
 
   private loadUnits(): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.units?.getAll?.()
-        .then((units: Unit[]) => {
-          if (units && units.length > 0) {
-            this.units$.next(units);
-          }
-        })
-        .catch((err: any) => {
-          console.error('Error loading units:', err);
-        });
+    interface ElectronAPI {
+      units?: { getAll?: () => Promise<Unit[]> };
     }
+    const windowWithElectron = globalThis.window as unknown as { electronAPI?: ElectronAPI };
+    windowWithElectron?.electronAPI?.units?.getAll?.()
+      .then((units: Unit[]) => {
+        if (units && units.length > 0) {
+          this.units$.next(units);
+        }
+      })
+      .catch((err: Error) => {
+        console.error('Error loading units:', err);
+      });
   }
 
   getUnits(): Observable<Unit[]> {

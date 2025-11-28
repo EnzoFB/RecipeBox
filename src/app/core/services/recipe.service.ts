@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Recipe, RecipeFormData } from '../models/recipe.model';
+import { ElectronAPI } from '../models/electron-api.model';
 
 declare global {
   interface Window {
-    electronAPI: any;
+    electronAPI?: ElectronAPI;
   }
 }
 
@@ -19,13 +20,14 @@ export class RecipeService {
   }
 
   private loadRecipes(): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.recipes.getAll().then((recipes: Recipe[]) => {
-        this.recipes$.next(recipes);
-      }).catch((err: any) => {
+    globalThis.window?.electronAPI?.recipes
+      .getAll()
+      .then((recipes: unknown[]) => {
+        this.recipes$.next(recipes as Recipe[]);
+      })
+      .catch((err: Error) => {
         console.error('Error loading recipes:', err);
       });
-    }
   }
 
   getRecipes(): Observable<Recipe[]> {
@@ -37,33 +39,36 @@ export class RecipeService {
   }
 
   addRecipe(recipe: RecipeFormData): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.recipes.add(recipe).then(() => {
+    globalThis.window?.electronAPI?.recipes
+      .create(recipe as unknown)
+      .then(() => {
         this.loadRecipes();
-      }).catch((err: any) => {
+      })
+      .catch((err: Error) => {
         console.error('Error adding recipe:', err);
       });
-    }
   }
 
   updateRecipe(id: number, recipe: RecipeFormData): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.recipes.update(id, recipe).then(() => {
+    globalThis.window?.electronAPI?.recipes
+      .update(id, recipe as unknown)
+      .then(() => {
         this.loadRecipes();
-      }).catch((err: any) => {
+      })
+      .catch((err: Error) => {
         console.error('Error updating recipe:', err);
       });
-    }
   }
 
   deleteRecipe(id: number): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.recipes.delete(id).then(() => {
+    globalThis.window?.electronAPI?.recipes
+      .delete(id)
+      .then(() => {
         this.loadRecipes();
-      }).catch((err: any) => {
+      })
+      .catch((err: Error) => {
         console.error('Error deleting recipe:', err);
       });
-    }
   }
 
   searchRecipes(query: string): Recipe[] {

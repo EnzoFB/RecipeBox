@@ -14,13 +14,14 @@ export class IngredientService {
   }
 
   private loadIngredients(): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.ingredients.getAll().then((ingredients: Ingredient[]) => {
-        this.ingredients$.next(ingredients);
-      }).catch((err: unknown) => {
+    globalThis.window?.electronAPI?.ingredients
+      .getAll()
+      .then((ingredients: unknown[]) => {
+        this.ingredients$.next(ingredients as Ingredient[]);
+      })
+      .catch((err: Error) => {
         console.error('Error loading ingredients:', err);
       });
-    }
   }
 
   getIngredients(): Observable<Ingredient[]> {
@@ -37,7 +38,7 @@ export class IngredientService {
 
   addIngredient(ingredient: Omit<Ingredient, 'id'>): Observable<void> {
     return from(
-      (globalThis.window as any).electronAPI?.ingredients.add(ingredient) || Promise.resolve()
+      globalThis.window?.electronAPI?.ingredients.add(ingredient as unknown) || Promise.resolve()
     ).pipe(
       map(() => undefined),
       tap(() => {
@@ -48,7 +49,7 @@ export class IngredientService {
 
   updateIngredient(id: number, ingredient: Omit<Ingredient, 'id'>): Observable<void> {
     return from(
-      (globalThis.window as any).electronAPI?.ingredients.update(id, ingredient) || Promise.resolve()
+      globalThis.window?.electronAPI?.ingredients.update(id, ingredient as unknown) || Promise.resolve()
     ).pipe(
       map(() => undefined),
       tap(() => {
@@ -58,13 +59,14 @@ export class IngredientService {
   }
 
   deleteIngredient(id: number): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.ingredients.delete(id).then(() => {
+    globalThis.window?.electronAPI?.ingredients
+      .delete(id)
+      .then(() => {
         setTimeout(() => this.loadIngredients(), 100);
-      }).catch((err: unknown) => {
+      })
+      .catch((err: Error) => {
         console.error('Error deleting ingredient:', err);
       });
-    }
   }
 
   searchIngredients(query: string): Ingredient[] {

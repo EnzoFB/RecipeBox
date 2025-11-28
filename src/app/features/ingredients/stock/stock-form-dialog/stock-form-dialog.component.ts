@@ -78,7 +78,7 @@ export class StockFormDialogComponent implements OnInit {
     }
 
     // Listen for ingredient changes
-    this.form.get('ingredientId')?.valueChanges.subscribe((value) => {
+    this.form.get('ingredientId')?.valueChanges.subscribe(() => {
       this.onIngredientSelected();
     });
   }

@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IngredientStock, StockWithDaysToExpiry } from '../models';
+import { Ingredient } from '../models/ingredient.model';
+import { ElectronAPI } from '../models/electron-api.model';
 
 declare global {
   interface Window {
-    electronAPI: any;
+    electronAPI?: ElectronAPI;
   }
 }
 
@@ -19,13 +21,14 @@ export class IngredientStockService {
   }
 
   private loadStock(): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.stock.getAll().then((stock: IngredientStock[]) => {
-        this.stock$.next(stock);
-      }).catch((err: any) => {
+    globalThis.window?.electronAPI?.stock
+      .getAll()
+      .then((stock: unknown[]) => {
+        this.stock$.next(stock as IngredientStock[]);
+      })
+      .catch((err: Error) => {
         console.error('Error loading stock:', err);
       });
-    }
   }
 
   getStock(): Observable<IngredientStock[]> {
@@ -53,46 +56,50 @@ export class IngredientStockService {
 
   getExpiringStock(): Observable<IngredientStock[]> {
     return new Observable(observer => {
-      if (globalThis.window && (globalThis.window as any).electronAPI) {
-        (globalThis.window as any).electronAPI.stock.getExpiring().then((stock: IngredientStock[]) => {
-          observer.next(stock);
+      globalThis.window?.electronAPI?.stock
+        .getAll()
+        .then((stock: unknown[]) => {
+          observer.next(stock as IngredientStock[]);
           observer.complete();
-        }).catch((err: any) => {
+        })
+        .catch((err: Error) => {
           console.error('Error fetching expiring stock:', err);
           observer.error(err);
         });
-      }
     });
   }
 
   addStock(stock: IngredientStock): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.stock.add(stock).then(() => {
+    globalThis.window?.electronAPI?.stock
+      .add(stock as unknown)
+      .then(() => {
         this.loadStock();
-      }).catch((err: any) => {
+      })
+      .catch((err: Error) => {
         console.error('Error adding stock:', err);
       });
-    }
   }
 
   updateStock(id: number, stock: IngredientStock): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.stock.update(id, stock).then(() => {
+    globalThis.window?.electronAPI?.stock
+      .update(id, stock as unknown)
+      .then(() => {
         this.loadStock();
-      }).catch((err: any) => {
+      })
+      .catch((err: Error) => {
         console.error('Error updating stock:', err);
       });
-    }
   }
 
   deleteStock(id: number): void {
-    if (globalThis.window && (globalThis.window as any).electronAPI) {
-      (globalThis.window as any).electronAPI.stock.delete(id).then(() => {
+    globalThis.window?.electronAPI?.stock
+      .delete(id)
+      .then(() => {
         this.loadStock();
-      }).catch((err: any) => {
+      })
+      .catch((err: Error) => {
         console.error('Error deleting stock:', err);
       });
-    }
   }
 
   // Helper method to check if a recipe can be made with current stock
@@ -250,17 +257,18 @@ export class IngredientStockService {
   }
 
   // Get ingredient details for a missing ingredient
-  getMissingIngredientDetails(ingredientId: number): Observable<any> {
+  getMissingIngredientDetails(ingredientId: number): Observable<Ingredient> {
     return new Observable(observer => {
-      if (globalThis.window && (globalThis.window as any).electronAPI) {
-        (globalThis.window as any).electronAPI.ingredients.getById(ingredientId).then((ingredient: any) => {
-          observer.next(ingredient);
+      globalThis.window?.electronAPI?.ingredients
+        .getById(ingredientId)
+        .then((ingredient: unknown) => {
+          observer.next(ingredient as Ingredient);
           observer.complete();
-        }).catch((err: any) => {
+        })
+        .catch((err: Error) => {
           console.error('Error fetching ingredient details:', err);
           observer.error(err);
         });
-      }
     });
   }
 
